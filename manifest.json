@@ -1,0 +1,10 @@
+{
+  "name": "ICAI Examiner Studio",
+  "short_name": "ICAI Examiner",
+  "description": "Live AI CA Foundation, Inter & Final Paper Evaluation and Self-Testing Studio",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FAF9F5",
+  "theme_color": "#D97757",
+  "orientation": "portrait-primary"
+}
