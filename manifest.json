@@ -1,0 +1,157 @@
+{
+  "id": "/?source=pwa",
+  "name": "ICAI Examiner Studio \u2014 CA Self-Testing & Evaluation",
+  "short_name": "ICAI Examiner",
+  "description": "Strict ICAI-standard CA Foundation, Intermediate & Final Paper Evaluation and Self-Testing Studio with live handwriting OCR and OMR MCQ quizzes.",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "orientation": "portrait-primary",
+  "background_color": "#FAF9F5",
+  "theme_color": "#D97757",
+  "categories": [
+    "education",
+    "productivity",
+    "finance",
+    "books"
+  ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "scope_extensions": [
+    {
+      "origin": "https://hackernext.github.io"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "handle_links": "preferred",
+  "edge_side_panel": {
+    "preferred_width": 420
+  },
+  "note_taking": {
+    "new_note_url": "./index.html?action=generate"
+  },
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "ICAI Step-by-Step Answer Sheet Evaluation"
+    },
+    {
+      "src": "./screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ICAI Interactive OMR Quiz & Pre-Submission Palette"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Upload & Check Sheet",
+      "short_name": "Check Sheet",
+      "description": "Upload a Question Paper PDF & Handwritten Answer Sheet for ICAI Evaluation",
+      "url": "./index.html?tab=tab-upload",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Generate ICAI Mock Paper",
+      "short_name": "Generate Paper",
+      "description": "Generate a fresh ICAI-pattern subjective paper or OMR quiz",
+      "url": "./index.html?tab=tab-generate",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "View Past Exam History",
+      "short_name": "Exam History",
+      "description": "Review past evaluated answer sheets and quiz scores",
+      "url": "./index.html?tab=tab-history",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "./index.html?action=open-file",
+      "accept": {
+        "application/pdf": [
+          ".pdf"
+        ],
+        "image/jpeg": [
+          ".jpg",
+          ".jpeg"
+        ],
+        "image/png": [
+          ".png"
+        ]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "./index.html?action=share-target",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+icaiexaminer",
+      "url": "./index.html?paper=%s"
+    }
+  ]
+}
