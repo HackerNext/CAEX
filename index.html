@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FAF9F5" id="meta-theme-color" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>ICAI Examiner — Live AI CA Evaluation & Quiz Studio</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="top-bar">
+      <div class="brand-row">
+        <div class="brand-badge">ICAI</div>
+        <div>
+          <h1 class="brand-title">Examiner Studio</h1>
+          <p class="brand-subtitle" id="header-level-subtitle">CA Foundation • Live AI Vision Engine</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="status-chip" id="api-indicator-chip" onclick="switchTab('tab-settings')">
+          <span class="status-dot" id="api-status-dot"></span>
+          <span id="api-status-label">API Key Needed</span>
+        </button>
+        <button class="icon-btn" id="theme-toggle-btn" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
+          <svg id="theme-icon-sun" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Viewport -->
+    <main class="main-content" id="main-content">
+
+      <!-- API Key Quick Setup Banner (Auto-hides once API key is saved) -->
+      <div class="api-alert-card" id="quick-api-banner">
+        <div class="row-between">
+          <span class="eyebrow">REQUIRED FOR REAL PDF & HANDWRITING CHECKING</span>
+        </div>
+        <h3 class="serif-heading" style="font-size:21px;">Connect Free Gemini Vision API Key</h3>
+        <p class="small-muted mb-8">To actually read your uploaded Question Paper PDFs and grade your handwritten Answer Sheet photos, paste your free Google AI Studio key below (saved strictly on your phone).</p>
+        <div class="api-inline-row">
+          <input type="password" class="text-input" id="banner-api-key-input" placeholder="Paste Gemini API Key (AIzaSy...)" />
+          <button class="primary-btn sm-btn" id="banner-save-key-btn">Activate AI</button>
+        </div>
+        <p class="small-muted mt-8">Don't have a key? Get one free in 10 seconds at <strong>aistudio.google.com/apikey</strong></p>
+      </div>
+
+      <!-- TAB 1: UPLOAD & EVALUATE / QUIZ -->
+      <section class="tab-pane active" id="tab-upload">
+        <div class="hero-card">
+          <span class="eyebrow">MODE 01 • LIVE PAPER & ANSWER SHEET CHECKER</span>
+          <h2 class="serif-heading">Evaluate Handwritten Sheets or Convert PDFs to Quizzes</h2>
+          <p class="muted-text">Reads your actual uploaded Question Paper PDF & Answer Sheet images/PDF to award step marks strictly per ICAI Study Material, RTPs, MTPs & PYQs.</p>
+        </div>
+
+        <!-- Level Selector -->
+        <div class="card">
+          <label class="section-label">1. Select CA Examination Level</label>
+          <div class="segmented-control" id="upload-level-selector">
+            <button class="seg-btn active" data-level="foundation">Foundation</button>
+            <button class="seg-btn" data-level="inter">Intermediate</button>
+            <button class="seg-btn" data-level="final">Final</button>
+          </div>
+
+          <label class="section-label mt-16">2. Select Subject & Paper Type</label>
+          <div class="subject-grid" id="upload-subject-grid"></div>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="card" id="upload-workflow-card">
+          <div class="workflow-header">
+            <span class="badge-pill" id="selected-paper-type-badge">Subjective Evaluation</span>
+            <span class="mono-tag" id="selected-paper-marks-tag">100 Marks • Step Marking</span>
+          </div>
+
+          <!-- Question Paper PDF Upload -->
+          <div class="upload-box" id="qp-upload-box">
+            <input type="file" id="qp-file-input" accept=".pdf,image/*" multiple hidden />
+            <div class="upload-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="upload-info">
+              <h4 id="qp-file-title">Upload Question Paper (PDF or Photos)</h4>
+              <p id="qp-file-desc">Reads all questions, sub-question numbering, compulsory rules & marks distribution</p>
+            </div>
+            <button class="secondary-btn sm-btn" onclick="document.getElementById('qp-file-input').click()">Select Paper</button>
+          </div>
+
+          <!-- Answer Sheet Upload (Shown only for Subjective / Hybrid) -->
+          <div class="upload-box mt-12" id="ans-upload-box">
+            <input type="file" id="ans-file-input" accept=".pdf,image/*" multiple hidden />
+            <div class="upload-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <div class="upload-info">
+              <h4 id="ans-file-title">Upload Your Written Answer Sheet (PDF or Photos)</h4>
+              <p id="ans-file-desc">Select all page photos or scanned PDF of your handwritten register</p>
+            </div>
+            <button class="secondary-btn sm-btn" onclick="document.getElementById('ans-file-input').click()">Select Sheets</button>
+          </div>
+
+          <!-- Error / Status Box -->
+          <div id="upload-error-box" class="error-banner hidden mt-12"></div>
+
+          <div class="action-stack mt-16">
+            <button class="primary-btn full-width" id="start-upload-action-btn">
+              Evaluate Uploaded Answer Sheet Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Output Workspace (Live Evaluation Report OR Extracted PDF Quiz) -->
+        <div id="active-workspace"></div>
+      </section>
+
+      <!-- TAB 2: GENERATE PAPER -->
+      <section class="tab-pane" id="tab-generate">
+        <div class="hero-card">
+          <span class="eyebrow">MODE 02 • LIVE AI ICAI PAPER GENERATOR</span>
+          <h2 class="serif-heading">Generate Fresh ICAI-Pattern Mock Papers</h2>
+          <p class="muted-text">Generates brand-new question papers or interactive MCQ quizzes tailored to ICAI Study Material, RTPs, MTPs & Past Exam weightages.</p>
+        </div>
+
+        <div class="card">
+          <label class="section-label">1. Examination Level & Subject</label>
+          <div class="segmented-control" id="gen-level-selector">
+            <button class="seg-btn active" data-level="foundation">Foundation</button>
+            <button class="seg-btn" data-level="inter">Intermediate</button>
+            <button class="seg-btn" data-level="final">Final</button>
+          </div>
+
+          <div class="subject-grid mt-12" id="gen-subject-grid"></div>
+
+          <label class="section-label mt-16">2. Paper Scope & Marks</label>
+          <div class="segmented-control" id="gen-marks-selector">
+            <button class="seg-btn active" data-marks="100">Full 100M Mock</button>
+            <button class="seg-btn" data-marks="50">Half 50M Test</button>
+            <button class="seg-btn" data-marks="30">Chapter 30M Drill</button>
+          </div>
+
+          <label class="section-label mt-16">3. Specific Chapters / Topics (Optional)</label>
+          <input type="text" class="text-input" id="gen-topic-input" placeholder="e.g., Bank Reconciliation, Partnership, Indian Contract Act, Time Value of Money..." />
+
+          <div id="gen-error-box" class="error-banner hidden mt-12"></div>
+
+          <button class="primary-btn full-width mt-16" id="generate-paper-btn">
+            Generate Fresh ICAI Question Paper
+          </button>
+        </div>
+
+        <div id="generated-paper-workspace"></div>
+      </section>
+
+      <!-- TAB 3: HISTORY -->
+      <section class="tab-pane" id="tab-history">
+        <div class="hero-card">
+          <span class="eyebrow">ARCHIVE & ANALYTICS</span>
+          <h2 class="serif-heading">Past Evaluations & Quiz Attempts</h2>
+          <p class="muted-text">Tap any past evaluation or quiz below to view your full question-wise breakdown.</p>
+        </div>
+        <div id="history-list-container"></div>
+      </section>
+
+      <!-- TAB 4: SETTINGS -->
+      <section class="tab-pane" id="tab-settings">
+        <div class="hero-card">
+          <span class="eyebrow">ENGINE & CONFIGURATION</span>
+          <h2 class="serif-heading">AI Vision & Checking Settings</h2>
+          <p class="muted-text">Configure your Gemini Multimodal API key and ICAI checking strictness.</p>
+        </div>
+
+        <div class="card">
+          <label class="section-label">1. Gemini API Key (Required for Live PDF & Handwriting OCR)</label>
+          <p class="small-muted mb-8">Your key is stored locally on your device and sends your uploaded PDFs/images directly to Google's Gemini Multimodal model.</p>
+          <input type="password" class="text-input" id="api-key-input" placeholder="AIzaSy..." />
+
+          <label class="section-label mt-12">2. Gemini Vision Model</label>
+          <select class="text-input" id="model-select">
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fastest & Recommended for PDFs/Handwriting)</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Deepest ICAI Step-Marking Reasoning)</option>
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash (High Quota Backup)</option>
+          </select>
+
+          <div class="row-between mt-12">
+            <span class="small-muted" id="api-key-status">No API key saved yet</span>
+            <button class="primary-btn sm-btn" id="save-api-key-btn">Save Configuration</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <label class="section-label">ICAI Checking Strictness</label>
+          <div class="segmented-control" id="strictness-selector">
+            <button class="seg-btn" data-strict="Moderate">Moderate</button>
+            <button class="seg-btn active" data-strict="Strict ICAI Standard">Strict ICAI</button>
+            <button class="seg-btn" data-strict="AIR Ranker Standard">AIR Ranker</button>
+          </div>
+          <p class="small-muted mt-8">Strict ICAI mode penalizes missing working notes, unquoted section/provision language, missing ledger narrations, and applies -0.25 negative marking in MCQs.</p>
+        </div>
+
+        <div class="card">
+          <label class="section-label">Data Management</label>
+          <div class="row-between">
+            <span>Clear All Saved Exam History</span>
+            <button class="danger-btn sm-btn" id="clear-history-btn">Reset History</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Pre-Submission Answer Review Modal (For MCQ Quizzes) -->
+    <div class="modal-backdrop hidden" id="review-modal">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">PRE-SUBMISSION CHECK</span>
+            <h3 class="serif-heading">Review Your Attempted Answers</h3>
+          </div>
+          <button class="icon-btn" id="close-review-modal-btn">✕</button>
+        </div>
+        <div class="review-summary-strip" id="review-summary-strip"></div>
+        <div class="review-grid" id="review-palette-grid"></div>
+        <div class="modal-footer">
+          <button class="secondary-btn" id="return-to-quiz-btn">Keep Editing</button>
+          <button class="primary-btn" id="confirm-submit-quiz-btn">Final Submit & View Result</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-target="tab-upload">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Upload & Check</span>
+      </button>
+      <button class="nav-item" data-target="tab-generate">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Generate Paper</span>
+      </button>
+      <button class="nav-item" data-target="tab-history">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>History</span>
+      </button>
+      <button class="nav-item" data-target="tab-settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
