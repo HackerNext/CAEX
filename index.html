@@ -1,0 +1,2930 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.8.0.3 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { margin-bottom: 0.1in; line-height: 115%; background: transparent }
+		pre { font-size: 10pt; font-family: "Liberation Mono", monospace; background: transparent }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre>import React, { useState, useEffect, useRef } from 'react';
+import {
+  FileText,
+  Upload,
+  Sparkles,
+  History,
+  Settings,
+  CheckCircle2,
+  AlertCircle,
+  BookOpen,
+  Clock,
+  ChevronRight,
+  ChevronLeft,
+  Award,
+  Camera,
+  FileCheck,
+  HelpCircle,
+  Moon,
+  Sun,
+  Download,
+  Trash2,
+  Eye,
+  Play,
+  Flag,
+  RotateCcw,
+  Layers,
+  Check,
+  X,
+  Info,
+  Scale,
+  Calculator,
+  Plus,
+  Smartphone,
+  Share2,
+  ArrowRight,
+  ListChecks,
+  FileSpreadsheet,
+  RefreshCw
+} from 'lucide-react';
+
+// ==========================================
+// ICAI SYLLABUS &amp; SUBJECT CONFIGURATION
+// ==========================================
+const CA_LEVELS = {
+  Foundation: {
+    label: 'CA Foundation',
+    badge: 'Entry Level',
+    subjects: [
+      {
+        id: 'f_acc',
+        code: 'Paper 1',
+        name: 'Accounting',
+        type: 'subjective',
+        marks: 100,
+        durationMins: 180,
+        readingMins: 15,
+        pattern: 'Q1 Compulsory (20M) + Attempt 4 out of remaining 5 Questions (20M each)',
+        chapters: [
+          'Theoretical Framework &amp; Accounting Process',
+          'Bank Reconciliation Statement (BRS)',
+          'Inventories &amp; Depreciation Accounting',
+          'Bills of Exchange &amp; Promissory Notes',
+          'Final Accounts of Sole Proprietors',
+          'Financial Statements of Not-for-Profit Organisations',
+          'Partnership Accounts (Admission, Retirement, Death)',
+          'Company Accounts (Issue &amp; Forfeiture of Shares, Debentures)'
+        ],
+        checkingRules: 'Step-wise marking per ICAI Examiner standards: Working Notes (30-40% weightage), Ledger/Schedule Format &amp; Headings, Journal Narrations, and Final Tally.'
+      },
+      {
+        id: 'f_law',
+        code: 'Paper 2',
+        name: 'Business Laws',
+        type: 'subjective',
+        marks: 100,
+        durationMins: 180,
+        readingMins: 15,
+        pattern: 'Q1 Compulsory (20M) + Attempt 4 out of remaining 5 Questions (20M each)',
+        chapters: [
+          'Indian Regulatory Framework',
+          'The Indian Contract Act, 1872',
+          'The Sale of Goods Act, 1930',
+          'The Indian Partnership Act, 1932',
+          'The Limited Liability Partnership Act, 2008',
+          'The Companies Act, 2013',
+          'The Negotiable Instruments Act, 1881'
+        ],
+        checkingRules: 'Strict 3-Tier ICAI Legal Grading: (1) Applicable Legal Provision &amp; Section/Act Citation, (2) Analysis &amp; Correlation with Given Case Facts, (3) Clear &amp; Direct Conclusion.'
+      },
+      {
+        id: 'f_qa',
+        code: 'Paper 3',
+        name: 'Quantitative Aptitude',
+        type: 'mcq',
+        marks: 100,
+        durationMins: 120,
+        readingMins: 0,
+        negativeMarking: 0.25,
+        pattern: '100 Objective MCQs (+1 Mark for Correct, -0.25 for Incorrect)',
+        chapters: [
+          'Ratio, Proportion, Indices, Logarithms',
+          'Mathematics of Finance (Time Value of Money)',
+          'Permutations, Combinations &amp; Sequence/Series',
+          'Differential &amp; Integral Calculus',
+          'Logical Reasoning (Number Series, Coding, Direction, Blood Relations)',
+          'Statistical Description of Data &amp; Central Tendency/Dispersion',
+          'Probability &amp; Theoretical Distributions',
+          'Correlation, Regression &amp; Index Numbers'
+        ],
+        checkingRules: 'Instant OMR evaluation with +1.00 for right answer, -0.25 negative marking for wrong answer, and 0 for unattempted.'
+      },
+      {
+        id: 'f_eco',
+        code: 'Paper 4',
+        name: 'Business Economics',
+        type: 'mcq',
+        marks: 100,
+        durationMins: 120,
+        readingMins: 0,
+        negativeMarking: 0.25,
+        pattern: '100 Objective MCQs (+1 Mark for Correct, -0.25 for Incorrect)',
+        chapters: [
+          'Nature &amp; Scope of Business Economics',
+          'Theory of Demand and Supply',
+          'Theory of Production and Cost',
+          'Price Determination in Different Markets',
+          'Determination of National Income',
+          'Public Finance &amp; Fiscal Policy',
+          'Money Market &amp; Monetary Policy',
+          'International Trade &amp; Indian Economy'
+        ],
+        checkingRules: 'Instant OMR evaluation with +1.00 for right answer, -0.25 negative marking for wrong answer, and 0 for unattempted.'
+      }
+    ]
+  },
+  Intermediate: {
+    label: 'CA Intermediate',
+    badge: 'Executive Level',
+    subjects: [
+      {
+        id: 'i_adv_acc',
+        code: 'Paper 1',
+        name: 'Advanced Accounting',
+        type: 'subjective',
+        marks: 100,
+        durationMins: 180,
+        readingMins: 15,
+        pattern: 'Accounting Standards (AS), Company Amalgamation, Consolidation &amp; Branch Accounts',
+        chapters: ['Accounting Standards (AS 2, 10, 13, 15, 16, 19, 20, 22, 26, 29)', 'Company Financial Statements', 'Buyback &amp; Internal Reconstruction', 'Amalgamation of Companies', 'Consolidated Financial Statements', 'Branch Accounting'],
+        checkingRules: 'Strict AS compliance citation, Working Notes for Goodwill/Minority Interest, Schedule III Format.'
+      },
+      {
+        id: 'i_law',
+        code: 'Paper 2',
+        name: 'Corporate and Other Laws',
+        type: 'subjective',
+        marks: 100,
+        durationMins: 180,
+        readingMins: 15,
+        pattern: 'Companies Act 2013 (Sec 1-148), FEMA 1999, General Clauses Act &amp; Interpretation',
+        chapters: ['Preliminary &amp; Incorporation', 'Prospectus &amp; Share Capital', 'Management &amp; Administration', 'Declaration &amp; Payment of Dividend', 'Accounts of Companies &amp; Audit', 'FEMA, 1999', 'Interpretation of Statutes'],
+        checkingRules: 'Mandatory Section/Rule numbers where applicable, Statutory Provision, Case Correlation, and Conclusion.'
+      },
+      {
+        id: 'i_tax',
+        code: 'Paper 3',
+        name: 'Taxation (Income Tax &amp; GST)',
+        type: 'subjective',
+        marks: 100,
+        durationMins: 180,
+        readingMins: 15,
+        pattern: 'Section A: Income Tax Law (50M) + Section B: Goods &amp; Services Tax (50M)',
+        chapters: ['Residential Status', 'Five Heads of Income (Salary, HP, PGBP, CG, IFOS)', 'Clubbing, Set-off &amp; Deductions (Ch VI-A)', 'Computation of Total Income (Sec 115BAC)', 'GST Supply, Charge, Exemption &amp; ITC', 'GST Registration, Invoice &amp; Payment'],
+        checkingRules: 'Step-wise computation tables, Working Notes for every adjustment/exemption, Section references.'
+      },
+      {
+        id: 'i_mcq',
+        code: 'Case MCQ',
+        name: 'Inter Integrated Case Scenario MCQs',
+        type: 'mcq',
+        marks: 30,
+        durationMins: 45,
+        readingMins: 0,
+        negativeMarking: 0,
+        pattern: 'ICAI 30% Integrated Case-Scenario MCQs (No Negative Marking)',
+        chapters: ['Accounting Standards Case Scenarios', 'Corporate Law &amp; FEMA Case Scenarios', 'Direct &amp; Indirect Tax Case Scenarios', 'Auditing &amp; Financial Management MCQs'],
+        checkingRules: 'ICAI Inter/Final Case Scenario rule: Full marks for correct option, 0 negative marking.'
+      }
+    ]
+  },
+  Final: {
+    label: 'CA Final',
+    badge: 'Professional Level',
+    subjects: [
+      {
+        id: 'fn_fr',
+        code: 'Paper 1',
+        name: 'Financial Reporting (Ind AS)',
+        type: 'subjective',
+        marks: 100,
+        durationMins: 180,
+        readingMins: 15,
+        pattern: 'Ind AS Financial Instruments, Business Combinations (Ind AS 103/110), Revenue (Ind AS 115) &amp; Leases (Ind AS 116)',
+        chapters: ['Ind AS 115 Revenue from Contracts', 'Ind AS 116 Leases', 'Ind AS 109/32 Financial Instruments', 'Ind AS 103 Business Combinations', 'Ind AS 110 Consolidated Financial Statements', 'Ind AS 36 Impairment &amp; Ind AS 102 Share-based Payment'],
+        checkingRules: 'Strict Ind AS recognition/measurement principles, amortized cost/PV tables, journal entries, and balance sheet extracts.'
+      },
+      {
+        id: 'fn_audit',
+        code: 'Paper 3',
+        name: 'Advanced Auditing, Assurance &amp; Professional Ethics',
+        type: 'subjective',
+        marks: 100,
+        durationMins: 180,
+        readingMins: 15,
+        pattern: 'Standards on Auditing (SAs), SQC 1, CARO 2020, Chartered Accountants Act 1949 &amp; Schedules',
+        chapters: ['Quality Control &amp; Engagement Standards (SAs)', 'Professional Ethics &amp; Schedules to CA Act, 1949', 'CARO 2020 &amp; Company Audit', 'Audit of Banks, NBFCs &amp; PSU', ' ESG, Forensic Audit &amp; Due Diligence'],
+        checkingRules: 'Exact Clause, Part &amp; Schedule citation for Professional Ethics; SA Number and Title; Guilty/Not Guilty verdict.'
+      },
+      {
+        id: 'fn_ibs_mcq',
+        code: 'Case MCQ',
+        name: 'Final Multi-Disciplinary &amp; Case MCQs',
+        type: 'mcq',
+        marks: 30,
+        durationMins: 45,
+        readingMins: 0,
+        negativeMarking: 0,
+        pattern: 'ICAI Final Case-Scenario MCQs (Ind AS, Direct Tax, Indirect Tax, Audit)',
+        chapters: ['Ind AS &amp; AFM Case Scenarios', 'Audit &amp; Professional Ethics Case Scenarios', 'Direct Tax &amp; International Tax MCQs', 'GST &amp; Customs Case Scenarios'],
+        checkingRules: 'ICAI Final Case Scenario rule: Step-by-step statutory explanation with 0 negative marking.'
+      }
+    ]
+  }
+};
+
+// ==========================================
+// BUILT-IN REALISTIC ICAI SAMPLE DATA
+// (For instant zero-setup testing on phone)
+// ==========================================
+const SAMPLE_SUBJECTIVE_PAPERS = {
+  f_acc: {
+    title: 'ICAI CA Foundation - Paper 1: Accounting (Mock Test Series - I)',
+    totalMarks: 20,
+    instructions: '1. Question No. 1 is compulsory.\n2. Working Notes should form part of the answer.\n3. Wherever necessary, suitable assumptions may be made and disclosed by way of a note.',
+    questions: [
+      {
+        qNo: '1(a)',
+        marks: 4,
+        text: 'State with reasons whether the following statements are &quot;True&quot; or &quot;False&quot; (2 Marks each):\n(i) Overhaul expenses of a second-hand machine purchased are Revenue Expenditure.\n(ii) Fees received for Life Membership is a revenue receipt as it is of recurring nature.'
+      },
+      {
+        qNo: '1(b)',
+        marks: 8,
+        text: 'On 31st March 2026, the Bank Pass Book of M/s Sharma Traders showed a credit balance of â¹48,000. On comparing it with the Cash Book, the following differences were discovered:\n1. Cheques issued amounting to â¹18,500 were not presented for payment up to 31st March 2026.\n2. Cheques deposited into bank of â¹24,000, out of which cheques of â¹9,000 were cleared on 4th April 2026.\n3. Bank charges of â¹650 and interest on investment collected by bank â¹3,200 appeared only in the Pass Book.\nPrepare a Bank Reconciliation Statement as on 31st March 2026.'
+      },
+      {
+        qNo: '1(c)',
+        marks: 8,
+        text: 'A Firm purchased a machinery for â¹5,00,000 on 1st October 2024 and paid â¹40,000 towards freight and installation. Depreciation is charged @ 15% p.a. on Diminishing Balance Method. Books are closed on 31st March every year. Prepare Machinery Account for the years ended 31st March 2025 and 31st March 2026.'
+      }
+    ],
+    sampleStudentHandwritingText: `Ans 1(a):
+(i) False: Overhaul expenses of second-hand machinery purchased are Capital Expenditure because they are incurred to put the asset into working condition and increase its earning capacity.
+(ii) False: Life Membership fee is a non-recurring receipt and hence is treated as a Capital Receipt (added to Capital Fund or shown separately on Liabilities side of Balance Sheet).
+
+Ans 1(b):
+Bank Reconciliation Statement of M/s Sharma Traders as on 31st March 2026
+Balance as per Pass Book (Cr.) = Rs. 48,000
+Less: Cheques issued but not presented = (18,500)
+Add: Cheques deposited but not cleared till 31st March = +9,000
+Add: Bank charges debited in Pass Book only = +650
+Less: Interest on investment collected by bank = (3,200)
+Balance as per Cash Book (Dr.) = Rs. 35,950
+
+Ans 1(c):
+Working Note: Cost of Machine = 5,00,000 + 40,000 = Rs. 5,40,000.
+Depreciation for 2024-25 (6 months from 1 Oct to 31 Mar) = 5,40,000 * 15% * 6/12 = Rs. 40,500.
+Closing WDV on 31.03.2025 = 4,99,500.
+Depreciation for 2025-26 (Full year) = 4,99,500 * 15% = Rs. 74,925.
+Closing WDV on 31.03.2026 = Rs. 4,24,575.
+(Note: Ledger Dr/Cr columns written on sheet without date column headers)`
+  },
+  f_law: {
+    title: 'ICAI CA Foundation - Paper 2: Business Laws (Mock Test Series - I)',
+    totalMarks: 18,
+    instructions: 'Question 1 is compulsory. Quote relevant provisions of the Indian Contract Act, 1872, Sale of Goods Act, 1930 and Companies Act, 2013.',
+    questions: [
+      {
+        qNo: '1(a)',
+        marks: 6,
+        text: 'Mr. Rohan promised to pay â¹50,000 to his wife Mrs. Priya on her birthday out of natural love and affection. The promise was oral and made in the presence of family members. Later, Mr. Rohan refused to pay. Advise Mrs. Priya whether she can recover the amount under the Indian Contract Act, 1872.'
+      },
+      {
+        qNo: '1(b)',
+        marks: 6,
+        text: 'Explain the Doctrine of &quot;Caveat Emptor&quot; and state any four exceptions to this rule under the Sale of Goods Act, 1930.'
+      },
+      {
+        qNo: '1(c)',
+        marks: 6,
+        text: 'ABC Private Limited has two shareholders, Mr. X and Mr. Y, who are also the only two directors of the company. While travelling together in a car, both died in a road accident. Does ABC Private Limited cease to exist? Explain with reference to the features of a Company under the Companies Act, 2013.'
+      }
+    ],
+    sampleStudentHandwritingText: `Answer 1(a):
+Provision: As per Section 25(1) of the Indian Contract Act, 1872, an agreement made without consideration is void unless it is expressed in writing and registered under the law for the time being in force for registration of documents, and is made on account of natural love and affection between parties standing in a near relation to each other.
+Facts of Case: Here Mr. Rohan promised Rs. 50,000 to his wife Mrs. Priya orally. Even though there is natural love and affection and near relation, the agreement is neither in writing nor registered.
+Conclusion: Mrs. Priya cannot recover Rs. 50,000 from Mr. Rohan as the oral promise lacks consideration and fails to fulfill conditions of Section 25(1).
+
+Answer 1(b):
+Caveat Emptor means &quot;Let the buyer beware&quot;. Under Section 16 of Sale of Goods Act, 1930, it is the duty of the buyer to satisfy himself about the quality and suitability of goods before buying.
+Exceptions:
+1. Fitness for buyer's purpose [Sec 16(1)]
+2. Goods purchased under patent or brand name
+3. Goods sold by description (Merchantable quality)
+4. Fraud or misrepresentation by the seller.
+
+Answer 1(c):
+According to the Companies Act, 2013, a company has Perpetual Succession. It is an artificial legal person created by law and its existence is separate from its members. Even if all shareholders/directors die in an accident, the company does not die. Shares will transmit to legal heirs of Mr. X and Mr. Y. Thus ABC Pvt Ltd continues to exist.`
+  }
+};
+
+const SAMPLE_MCQ_QUIZZES = {
+  f_qa: {
+    title: 'ICAI CA Foundation - Paper 3: Quantitative Aptitude (High-Yield RTP Quiz)',
+    negativeMarking: 0.25,
+    questions: [
+      {
+        id: 1,
+        qNo: 'Q1',
+        chapter: 'Mathematics of Finance',
+        question: 'A sum of money doubles itself at compound interest in 10 years. In how many years will it become eight times of itself at the same rate of compound interest?',
+        options: ['20 years', '30 years', '40 years', '25 years'],
+        correctIndex: 1,
+        explanation: 'As per ICAI Module shortcut: If P becomes 2P in 10 years, then 8P = (2Â³)P. Therefore, time required = 3 Ã 10 years = 30 years.'
+      },
+      {
+        id: 2,
+        qNo: 'Q2',
+        chapter: 'Measures of Central Tendency &amp; Dispersion',
+        question: 'If the relation between two variables x and y is 2x + 5y = 20, and the Median of x is 5, then what is the Median of y?',
+        options: ['2', '4', '3', '5'],
+        correctIndex: 0,
+        explanation: 'By property of Median under linear change of origin and scale: 2(Me_x) + 5(Me_y) = 20. Substituting Me_x = 5 gives 2(5) + 5(Me_y) = 20 â 5(Me_y) = 10 â Me_y = 2.'
+      },
+      {
+        id: 3,
+        qNo: 'Q3',
+        chapter: 'Logical Reasoning - Blood Relations',
+        question: 'Pointing to a photograph, Vipul said, &quot;She is the daughter of my grandfather\'s only son.&quot; How is Vipul related to the girl in the photograph?',
+        options: ['Father', 'Brother', 'Cousin', 'Uncle'],
+        correctIndex: 1,
+        explanation: 'My grandfather\'s only son = Vipul\'s father. Daughter of Vipul\'s father = Vipul\'s sister. Therefore, Vipul is the Brother of the girl.'
+      },
+      {
+        id: 4,
+        qNo: 'Q4',
+        chapter: 'Probability',
+        question: 'If P(A) = 1/3, P(B) = 1/4, and the events A and B are independent, then find the probability that at least one of the events A or B occurs, i.e., P(A âª B).',
+        options: ['7/12', '1/2', '5/12', '1/12'],
+        correctIndex: 1,
+        explanation: 'Since A and B are independent, P(A â© B) = P(A) Ã P(B) = (1/3)(1/4) = 1/12. By Addition Theorem: P(A âª B) = P(A) + P(B) - P(A â© B) = 1/3 + 1/4 - 1/12 = (4 + 3 - 1)/12 = 6/12 = 1/2.'
+      },
+      {
+        id: 5,
+        qNo: 'Q5',
+        chapter: 'Ratio, Proportion, Indices &amp; Logarithms',
+        question: 'If logââ 2 = 0.3010 and logââ 3 = 0.4771, then the value of logââ 24 is:',
+        options: ['1.3801', '1.2041', '1.4771', '1.0791'],
+        correctIndex: 0,
+        explanation: '24 = 2Â³ Ã 3. Using logarithm laws: logââ(24) = 3 logââ(2) + logââ(3) = 3(0.3010) + 0.4771 = 0.9030 + 0.4771 = 1.3801.'
+      },
+      {
+        id: 6,
+        qNo: 'Q6',
+        chapter: 'Correlation &amp; Regression',
+        question: 'If the two regression lines are 8x - 10y + 66 = 0 and 40x - 18y = 214, then the mean values (xÌ, È³) of the series are:',
+        options: ['(13, 17)', '(17, 13)', '(13, -17)', '(-13, 17)'],
+        correctIndex: 0,
+        explanation: 'The two regression lines always intersect at the point of means (xÌ, È³). Substituting (13, 17) into 8x - 10y + 66 = 0: 8(13) - 10(17) + 66 = 104 - 170 + 66 = 0. And 40(13) - 18(17) = 520 - 306 = 214. Hence (13, 17).'
+      }
+    ]
+  },
+  f_eco: {
+    title: 'ICAI CA Foundation - Paper 4: Business Economics (MTP / PYQ Quiz)',
+    negativeMarking: 0.25,
+    questions: [
+      {
+        id: 1,
+        qNo: 'Q1',
+        chapter: 'Theory of Demand and Supply',
+        question: 'When the price of a commodity falls from â¹20 to â¹16, the quantity demanded rises from 100 units to 140 units. Using the Point Elasticity method, the price elasticity of demand is:',
+        options: ['(-) 2.0', '(-) 1.5', '(-) 2.5', '(-) 0.5'],
+        correctIndex: 0,
+        explanation: 'Point Price Elasticity Ep = (ÎQ / ÎP) Ã (P / Q). Here ÎQ = 40, ÎP = -4, P = 20, Q = 100. Thus Ep = (40 / -4) Ã (20 / 100) = -10 Ã 0.2 = -2.0.'
+      },
+      {
+        id: 2,
+        qNo: 'Q2',
+        chapter: 'Price Determination in Different Markets',
+        question: 'Kinked Demand Curve hypothesis under Oligopoly is designed to explain which of the following phenomena?',
+        options: [
+          'Price and output determination',
+          'Price rigidity in oligopolistic markets',
+          'Collusion among rival firms',
+          'Price leadership by a dominant firm'
+        ],
+        correctIndex: 1,
+        explanation: 'Propounded by Paul M. Sweezy, the Kinked Demand Curve model explains why prices in oligopolistic markets remain rigid (sticky) at the prevailing price level because demand is elastic above the kink and inelastic below it.'
+      },
+      {
+        id: 3,
+        qNo: 'Q3',
+        chapter: 'Determination of National Income',
+        question: 'In a two-sector economy, if the Marginal Propensity to Consume (MPC) is 0.75 and autonomous investment increases by â¹2,000 Crores, the equilibrium National Income will increase by:',
+        options: ['â¹6,000 Crores', 'â¹8,000 Crores', 'â¹2,667 Crores', 'â¹10,000 Crores'],
+        correctIndex: 1,
+        explanation: 'Investment Multiplier k = 1 / (1 - MPC) = 1 / (1 - 0.75) = 1 / 0.25 = 4. Increase in National Income (ÎY) = k Ã ÎI = 4 Ã â¹2,000 Crores = â¹8,000 Crores.'
+      },
+      {
+        id: 4,
+        qNo: 'Q4',
+        chapter: 'Theory of Production and Cost',
+        question: 'At the point of inflection on the Total Product (TP) curve:',
+        options: [
+          'Average Product (AP) is maximum',
+          'Marginal Product (MP) is maximum',
+          'Marginal Product (MP) is zero',
+          'Total Product (TP) is maximum'
+        ],
+        correctIndex: 1,
+        explanation: 'As per the Law of Variable Proportions in the ICAI Module, TP increases at an increasing rate up to the point of inflection. At the point of inflection itself, Marginal Product (MP) attains its maximum value.'
+      },
+      {
+        id: 5,
+        qNo: 'Q5',
+        chapter: 'Public Finance',
+        question: 'Which market failure occurs when one party in a transaction possesses more material information than the other party (e.g., health insurance buyer hiding medical history)?',
+        options: [
+          'Tragedy of the Commons',
+          'Asymmetric Information &amp; Adverse Selection',
+          'Positive Externality',
+          'Natural Monopoly'
+        ],
+        correctIndex: 1,
+        explanation: 'According to ICAI Public Finance unit, imbalance of information between buyers and sellers is Asymmetric Information, which prior to a contract leads to Adverse Selection.'
+      },
+      {
+        id: 6,
+        qNo: 'Q6',
+        chapter: 'Money Market &amp; Monetary Policy',
+        question: 'According to RBI\'s monetary aggregates, which of the following represents &quot;Broad Money&quot; (M3)?',
+        options: [
+          'Currency with the Public + Demand Deposits with Banks + Other Deposits with RBI',
+          'M1 + Post Office Savings Bank Deposits',
+          'M1 + Time Deposits with the Banking System',
+          'M2 + Total Deposits with Post Office Savings Organization'
+        ],
+        correctIndex: 2,
+        explanation: 'As per RBI norms in the ICAI Economics syllabus: M1 = Currency with public + Demand deposits + Other deposits with RBI (Narrow Money). M3 = M1 + Net Time Deposits with the Banking System (Broad Money).'
+      }
+    ]
+  }
+};
+
+// ==========================================
+// GEMINI API HELPER WITH EXPONENTIAL BACKOFF
+// ==========================================
+async function callGeminiAPI({ systemPrompt, userPrompt, inlineFiles = [], jsonSchema = null, customApiKey = '' }) {
+  const apiKey = customApiKey ? customApiKey.trim() : &quot;&quot;;
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+  const parts = [{ text: userPrompt }];
+  for (const file of inlineFiles) {
+    if (file.base64 &amp;&amp; file.mimeType) {
+      parts.push({
+        inlineData: {
+          mimeType: file.mimeType,
+          data: file.base64
+        }
+      });
+    }
+  }
+
+  const payload = {
+    contents: [{ role: 'user', parts }],
+    systemInstruction: {
+      parts: [{ text: systemPrompt }]
+    }
+  };
+
+  if (jsonSchema) {
+    payload.generationConfig = {
+      responseMimeType: 'application/json',
+      responseSchema: jsonSchema
+    };
+  }
+
+  const delays = [1000, 2000, 4000];
+  let lastError = null;
+
+  for (let attempt = 0; attempt &lt;= delays.length; attempt++) {
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`API status ${response.status}: ${errText}`);
+      }
+
+      const result = await response.json();
+      const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error('Empty response from Gemini evaluator.');
+
+      return jsonSchema ? JSON.parse(text) : text;
+    } catch (err) {
+      lastError = err;
+      if (attempt &lt; delays.length) {
+        await new Promise((r) =&gt; setTimeout(r, delays[attempt]));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+// File to Base64 utility
+function fileToBase64(file) {
+  return new Promise((resolve, reject) =&gt; {
+    const reader = new FileReader();
+    reader.onload = () =&gt; {
+      const resultStr = reader.result;
+      const base64 = resultStr.split(',')[1];
+      resolve({
+        name: file.name,
+        mimeType: file.type || 'application/pdf',
+        base64,
+        previewUrl: file.type?.startsWith('image/') ? resultStr : null,
+        sizeKB: Math.round(file.size / 1024)
+      });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ==========================================
+// MAIN APPLICATION COMPONENT
+// ==========================================
+export default function App() {
+  // Navigation &amp; Theme State
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'generate' | 'history' | 'settings'
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Global CA Profile State
+  const [selectedLevel, setSelectedLevel] = useState('Foundation');
+  const [selectedSubjectId, setSelectedSubjectId] = useState('f_acc');
+  const [customApiKey, setCustomApiKey] = useState('');
+  const [enableExamTimer, setEnableExamTimer] = useState(true);
+
+  // Mode 1: Upload &amp; Check State
+  const [questionPaperFile, setQuestionPaperFile] = useState(null);
+  const [parsedQuestionPaper, setParsedQuestionPaper] = useState(null);
+  const [answerSheetFiles, setAnswerSheetFiles] = useState([]);
+  const [manualAnswerText, setManualAnswerText] = useState('');
+  const [showManualTextToggle, setShowManualTextToggle] = useState(false);
+  const [isParsingQP, setIsParsingQP] = useState(false);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [evaluationReport, setEvaluationReport] = useState(null);
+  const [statusBanner, setStatusBanner] = useState(null); // { type: 'info'|'error'|'success', message: '' }
+
+  // Mode 2: Generate Paper State
+  const [genScope, setGenScope] = useState('custom'); // 'full' (100M) | 'custom' (20-30M)
+  const [genSelectedChapter, setGenSelectedChapter] = useState('All Syllabus Chapters (ICAI Weightage)');
+  const [isGeneratingPaper, setIsGeneratingPaper] = useState(false);
+  const [generatedPaper, setGeneratedPaper] = useState(null);
+  const [genAnswerFiles, setGenAnswerFiles] = useState([]);
+  const [genManualAnswer, setGenManualAnswer] = useState('');
+
+  // Exam Timer State (For Generated Subjective Papers &amp; Quizzes)
+  const [timerActive, setTimerActive] = useState(false);
+  const [timerSecondsLeft, setTimerSecondsLeft] = useState(0);
+  const [isReadingTime, setIsReadingTime] = useState(false);
+
+  // Interactive MCQ Quiz Engine State
+  const [activeQuiz, setActiveQuiz] = useState(null); // { title, subjectName, level, negativeMarking, questions: [] }
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [userResponses, setUserResponses] = useState({}); // { [qIndex]: selectedOptionIndex }
+  const [markedForReview, setMarkedForReview] = useState({}); // { [qIndex]: boolean }
+  const [showReviewDrawer, setShowReviewDrawer] = useState(false);
+  const [quizResult, setQuizResult] = useState(null);
+  const [quizElapsedSeconds, setQuizElapsedSeconds] = useState(0);
+
+  // History State
+  const [historyItems, setHistoryItems] = useState([]);
+  const [viewingHistoryItem, setViewingHistoryItem] = useState(null);
+
+  // Load saved preferences &amp; history from localStorage
+  useEffect(() =&gt; {
+    try {
+      const savedHistory = localStorage.getItem('icai_examiner_history_v1');
+      if (savedHistory) setHistoryItems(JSON.parse(savedHistory));
+
+      const savedTheme = localStorage.getItem('icai_examiner_dark');
+      if (savedTheme === 'true') setDarkMode(true);
+
+      const savedKey = localStorage.getItem('icai_examiner_apikey');
+      if (savedKey) setCustomApiKey(savedKey);
+    } catch (e) {
+      console.error('Could not load localStorage:', e);
+    }
+  }, []);
+
+  // Save history helper
+  const saveToHistory = (item) =&gt; {
+    const updated = [item, ...historyItems].slice(0, 40);
+    setHistoryItems(updated);
+    try {
+      localStorage.setItem('icai_examiner_history_v1', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Could not save history:', e);
+    }
+  };
+
+  // Update selectedSubjectId when level changes
+  const currentLevelObj = CA_LEVELS[selectedLevel];
+  const currentSubject =
+    currentLevelObj.subjects.find((s) =&gt; s.id === selectedSubjectId) ||
+    currentLevelObj.subjects[0];
+
+  const handleLevelChange = (newLevel) =&gt; {
+    setSelectedLevel(newLevel);
+    const firstSubj = CA_LEVELS[newLevel].subjects[0];
+    setSelectedSubjectId(firstSubj.id);
+    setGenSelectedChapter('All Syllabus Chapters (ICAI Weightage)');
+    setEvaluationReport(null);
+  };
+
+  // Exam &amp; Quiz Timer Hook
+  useEffect(() =&gt; {
+    let interval = null;
+    if (timerActive &amp;&amp; timerSecondsLeft &gt; 0) {
+      interval = setInterval(() =&gt; {
+        setTimerSecondsLeft((prev) =&gt; {
+          if (prev &lt;= 1) {
+            if (isReadingTime) {
+              setIsReadingTime(false);
+              return currentSubject.durationMins * 60;
+            }
+            setTimerActive(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () =&gt; clearInterval(interval);
+  }, [timerActive, timerSecondsLeft, isReadingTime, currentSubject]);
+
+  // Quiz elapsed timer
+  useEffect(() =&gt; {
+    let qTimer = null;
+    if (activeQuiz &amp;&amp; !quizResult) {
+      qTimer = setInterval(() =&gt; {
+        setQuizElapsedSeconds((prev) =&gt; prev + 1);
+      }, 1000);
+    }
+    return () =&gt; clearInterval(qTimer);
+  }, [activeQuiz, quizResult]);
+
+  const formatTime = (secs) =&gt; {
+    const hrs = Math.floor(secs / 3600);
+    const mins = Math.floor((secs % 3600) / 60);
+    const remSecs = secs % 60;
+    if (hrs &gt; 0) {
+      return `${hrs}:${String(mins).padStart(2, '0')}:${String(remSecs).padStart(2, '0')}`;
+    }
+    return `${String(mins).padStart(2, '0')}:${String(remSecs).padStart(2, '0')}`;
+  };
+
+  // ==========================================
+  // HANDLERS: QUESTION PAPER PARSING &amp; QUIZ CONVERSION
+  // ==========================================
+  const handleQPUpload = async (e) =&gt; {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setStatusBanner({ type: 'info', message: `Reading &quot;${file.name}&quot; and extracting ICAI question structure...` });
+    setIsParsingQP(true);
+    setEvaluationReport(null);
+
+    try {
+      const encoded = await fileToBase64(file);
+      setQuestionPaperFile(encoded);
+
+      if (currentSubject.type === 'subjective') {
+        const schema = {
+          type: 'OBJECT',
+          properties: {
+            title: { type: 'STRING' },
+            totalMarks: { type: 'NUMBER' },
+            instructions: { type: 'STRING' },
+            questions: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  qNo: { type: 'STRING' },
+                  marks: { type: 'NUMBER' },
+                  text: { type: 'STRING' }
+                },
+                propertyOrdering: ['qNo', 'marks', 'text']
+              }
+            }
+          },
+          propertyOrdering: ['title', 'totalMarks', 'instructions', 'questions']
+        };
+
+        const parsed = await callGeminiAPI({
+          customApiKey,
+          systemPrompt: `You are an expert ICAI Chartered Accountancy Question Paper Parser for ${currentLevelObj.label} - ${currentSubject.name}. Extract every question, sub-question number (e.g. 1(a), 1(b), 2(a)), exact question wording/tables, and marks allocated from the uploaded Question Paper PDF/image.`,
+          userPrompt: `Read this ${currentSubject.name} question paper carefully. Extract the paper title, total marks, compulsory/optional instructions, and all individual sub-questions in exact order with their marks.`,
+          inlineFiles: [encoded],
+          jsonSchema: schema
+        });
+
+        setParsedQuestionPaper(parsed);
+        setStatusBanner({
+          type: 'success',
+          message: `Parsed &quot;${parsed.title}&quot; (${parsed.totalMarks} Marks, ${parsed.questions?.length || 0} sub-questions detected). Now upload your Answer Sheet!`
+        });
+      } else {
+        // MCQ Subject: Convert PDF directly into Interactive Quiz!
+        const quizSchema = {
+          type: 'OBJECT',
+          properties: {
+            title: { type: 'STRING' },
+            questions: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  qNo: { type: 'STRING' },
+                  chapter: { type: 'STRING' },
+                  question: { type: 'STRING' },
+                  options: {
+                    type: 'ARRAY',
+                    items: { type: 'STRING' }
+                  },
+                  correctIndex: { type: 'NUMBER' },
+                  explanation: { type: 'STRING' }
+                },
+                propertyOrdering: ['qNo', 'chapter', 'question', 'options', 'correctIndex', 'explanation']
+              }
+            }
+          },
+          propertyOrdering: ['title', 'questions']
+        };
+
+        const parsedQuiz = await callGeminiAPI({
+          customApiKey,
+          systemPrompt: `You are a Senior ICAI Examiner for ${currentLevelObj.label} - ${currentSubject.name}. Convert the uploaded Question Paper PDF into an interactive MCQ test. Solve every question firsthand strictly using ICAI Study Material, RTPs, MTPs, and PYQs. Provide the 4 options (index 0 to 3), the verified correctIndex (0, 1, 2, or 3), and a clear step-by-step ICAI formula/concept explanation.`,
+          userPrompt: `Extract all MCQs from this ${currentSubject.name} question paper PDF. If the paper has many questions, extract up to 25 high-clarity questions in exact numbering order and solve them accurately.`,
+          inlineFiles: [encoded],
+          jsonSchema: quizSchema
+        });
+
+        startQuizSession({
+          title: parsedQuiz.title || `${currentSubject.name} - Uploaded Paper Quiz`,
+          subjectName: currentSubject.name,
+          level: currentLevelObj.label,
+          negativeMarking: currentSubject.negativeMarking ?? 0.25,
+          questions: (parsedQuiz.questions || []).map((q, idx) =&gt; ({ ...q, id: idx + 1 }))
+        });
+        setStatusBanner(null);
+      }
+    } catch (err) {
+      setStatusBanner({
+        type: 'error',
+        message: `Could not parse file automatically (${err.message}). You can also load the Built-in ICAI Sample Paper below to test immediately.`
+      });
+    } finally {
+      setIsParsingQP(false);
+    }
+  };
+
+  // Load Pre-Built Sample Question Paper or Quiz for Instant Testing
+  const handleLoadSamplePaper = () =&gt; {
+    setEvaluationReport(null);
+    if (currentSubject.type === 'subjective') {
+      const sample = SAMPLE_SUBJECTIVE_PAPERS[currentSubject.id] || SAMPLE_SUBJECTIVE_PAPERS.f_acc;
+      setParsedQuestionPaper(sample);
+      setManualAnswerText(sample.sampleStudentHandwritingText);
+      setShowManualTextToggle(true);
+      setStatusBanner({
+        type: 'success',
+        message: `Loaded Sample ICAI ${currentSubject.name} Question Paper &amp; Sample Handwritten Answer Transcript! Click &quot;Evaluate Answer Sheet&quot; below to see ICAI step-marking.`
+      });
+    } else {
+      const sampleQuiz = SAMPLE_MCQ_QUIZZES[currentSubject.id] || SAMPLE_MCQ_QUIZZES.f_qa;
+      startQuizSession({
+        title: sampleQuiz.title,
+        subjectName: currentSubject.name,
+        level: currentLevelObj.label,
+        negativeMarking: currentSubject.negativeMarking ?? 0.25,
+        questions: sampleQuiz.questions
+      });
+    }
+  };
+
+  // Handle Answer Sheet Upload (Multiple Photos or PDF)
+  const handleAnswerSheetUpload = async (e, isForGenerated = false) =&gt; {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    try {
+      const encodedList = await Promise.all(files.map((f) =&gt; fileToBase64(f)));
+      if (isForGenerated) {
+        setGenAnswerFiles((prev) =&gt; [...prev, ...encodedList]);
+      } else {
+        setAnswerSheetFiles((prev) =&gt; [...prev, ...encodedList]);
+      }
+      setStatusBanner({
+        type: 'success',
+        message: `Added ${encodedList.length} page(s) of your handwritten Answer Sheet.`
+      });
+    } catch (err) {
+      setStatusBanner({ type: 'error', message: 'Failed to read answer sheet files.' });
+    }
+  };
+
+  // ==========================================
+  // HANDLER: STRICT ICAI ANSWER SHEET EVALUATION
+  // ==========================================
+  const handleEvaluateSubjective = async (paperToUse, uploadedSheetFiles, transcriptText) =&gt; {
+    if (!paperToUse) {
+      setStatusBanner({ type: 'error', message: 'Please upload or load a Question Paper first.' });
+      return;
+    }
+    if (uploadedSheetFiles.length === 0 &amp;&amp; !transcriptText.trim()) {
+      setStatusBanner({
+        type: 'error',
+        message: 'Please upload photos/PDF of your handwritten Answer Sheet (or paste/load sample answer text).'
+      });
+      return;
+    }
+
+    setIsEvaluating(true);
+    setStatusBanner({
+      type: 'info',
+      message: `ICAI Examiner is checking your ${currentSubject.name} Answer Sheet against ICAI Study Material, RTPs, MTPs &amp; Step-Marking norms...`
+    });
+
+    const evalSchema = {
+      type: 'OBJECT',
+      properties: {
+        paperTitle: { type: 'STRING' },
+        totalAwardedMarks: { type: 'NUMBER' },
+        maxMarks: { type: 'NUMBER' },
+        percentage: { type: 'NUMBER' },
+        examinerVerdict: { type: 'STRING' },
+        overallStrengths: {
+          type: 'ARRAY',
+          items: { type: 'STRING' }
+        },
+        icaiImprovementTips: {
+          type: 'ARRAY',
+          items: { type: 'STRING' }
+        },
+        questionEvaluations: {
+          type: 'ARRAY',
+          items: {
+            type: 'OBJECT',
+            properties: {
+              qNo: { type: 'STRING' },
+              questionText: { type: 'STRING' },
+              maxMarks: { type: 'NUMBER' },
+              awardedMarks: { type: 'NUMBER' },
+              studentTranscribedAnswer: { type: 'STRING' },
+              stepMarksBreakdown: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    stepComponent: { type: 'STRING' },
+                    marksGiven: { type: 'NUMBER' },
+                    maxStepMarks: { type: 'NUMBER' }
+                  },
+                  propertyOrdering: ['stepComponent', 'marksGiven', 'maxStepMarks']
+                }
+              },
+              specificDeductions: { type: 'STRING' },
+              icaiSuggestedModelAnswer: { type: 'STRING' }
+            },
+            propertyOrdering: [
+              'qNo',
+              'questionText',
+              'maxMarks',
+              'awardedMarks',
+              'studentTranscribedAnswer',
+              'stepMarksBreakdown',
+              'specificDeductions',
+              'icaiSuggestedModelAnswer'
+            ]
+          }
+        }
+      },
+      propertyOrdering: [
+        'paperTitle',
+        'totalAwardedMarks',
+        'maxMarks',
+        'percentage',
+        'examinerVerdict',
+        'overallStrengths',
+        'icaiImprovementTips',
+        'questionEvaluations'
+      ]
+    };
+
+    const inlineAttachments = [];
+    if (questionPaperFile &amp;&amp; paperToUse === parsedQuestionPaper) {
+      inlineAttachments.push(questionPaperFile);
+    }
+    inlineAttachments.push(...uploadedSheetFiles);
+
+    const qpFormatted = JSON.stringify(paperToUse, null, 2);
+
+    try {
+      const report = await callGeminiAPI({
+        customApiKey,
+        systemPrompt: `You are a strict Senior ICAI Head Examiner evaluating a student's answer sheet for ${currentLevelObj.label} - ${currentSubject.name} (${currentSubject.code}).
+Follow official ICAI checking guidelines based strictly on ICAI Study Material, Modules, RTPs, MTPs, and Past Year Suggested Answers:
+1. Subject Rule: ${currentSubject.checkingRules}
+2. For Accounting / Practical subjects: Award step marks for Working Notes, Format/Headings, Journal Narrations, and individual correct adjustments even if the final total slightly differs. Deduct 0.5 to 1 mark if Working Notes or proper format headers (Dr./Cr., Date, Particulars) are missing.
+3. For Business Laws / Auditing / Theory: Check strictly in 3 parts: (a) Statutory Legal Provision &amp; Section/Act citation, (b) Analysis &amp; application to given case facts, (c) Conclusion. Do not give full marks to general/vague English if ICAI technical legal keywords are missing.
+4. Read the student's uploaded handwritten images/PDF (or transcript) carefully and map each answer to the exact Question Number in the Question Paper.`,
+        userPrompt: `Evaluate this student's Answer Sheet against the following ICAI Question Paper:
+QUESTION PAPER DETAILS:
+${qpFormatted}
+
+${transcriptText ? `STUDENT WRITTEN ANSWER TRANSCRIPT:\n${transcriptText}` : 'Refer to the attached handwritten Answer Sheet images/PDF uploaded by the student.'}
+
+Grade each question strictly according to ICAI marking scheme and return the detailed JSON scorecard.`,
+        inlineFiles: inlineAttachments,
+        jsonSchema: evalSchema
+      });
+
+      setEvaluationReport(report);
+      setStatusBanner(null);
+
+      // Save to History
+      saveToHistory({
+        id: 'eval_' + Date.now(),
+        timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
+        mode: 'Subjective Evaluation',
+        level: currentLevelObj.label,
+        subjectName: currentSubject.name,
+        title: report.paperTitle || paperToUse.title,
+        score: report.totalAwardedMarks,
+        maxScore: report.maxMarks,
+        percentage: report.percentage,
+        data: report
+      });
+    } catch (err) {
+      setStatusBanner({
+        type: 'error',
+        message: `Evaluation encountered an error: ${err.message}. Please verify your files or try again.`
+      });
+    } finally {
+      setIsEvaluating(false);
+    }
+  };
+
+  // ==========================================
+  // HANDLER: AI ICAI PAPER GENERATOR (MODE 2)
+  // ==========================================
+  const handleGenerateICAIPaper = async () =&gt; {
+    setIsGeneratingPaper(true);
+    setEvaluationReport(null);
+    setGeneratedPaper(null);
+    setGenAnswerFiles([]);
+    setGenManualAnswer('');
+
+    const targetMarks = genScope === 'full' ? currentSubject.marks : 25;
+    const chapterInstruction =
+      genSelectedChapter === 'All Syllabus Chapters (ICAI Weightage)'
+        ? `Cover high-weightage chapters across the full ICAI syllabus: ${currentSubject.chapters.join(', ')}`
+        : `Focus strictly on the chapter: &quot;${genSelectedChapter}&quot;`;
+
+    setStatusBanner({
+      type: 'info',
+      message: `Generating strict ICAI pattern ${currentSubject.name} paper (${targetMarks} Marks) based on Study Material, RTPs &amp; PYQs...`
+    });
+
+    try {
+      if (currentSubject.type === 'subjective') {
+        const qpSchema = {
+          type: 'OBJECT',
+          properties: {
+            title: { type: 'STRING' },
+            totalMarks: { type: 'NUMBER' },
+            instructions: { type: 'STRING' },
+            questions: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  qNo: { type: 'STRING' },
+                  marks: { type: 'NUMBER' },
+                  text: { type: 'STRING' }
+                },
+                propertyOrdering: ['qNo', 'marks', 'text']
+              }
+            }
+          },
+          propertyOrdering: ['title', 'totalMarks', 'instructions', 'questions']
+        };
+
+        const generated = await callGeminiAPI({
+          customApiKey,
+          systemPrompt: `You are the ICAI Examination Department setting an official Question Paper for ${currentLevelObj.label} - ${currentSubject.name} (${currentSubject.code}).
+Strictly adhere to ICAI Study Material, RTPs, MTPs, and Past Exam standards.
+- For Accounting/Tax/FR: Include realistic numerical figures, trial balance/adjustment items, dates, and clear requirements (e.g., &quot;Prepare Bank Reconciliation Statement&quot;, &quot;Pass Journal Entries and prepare Machinery A/c&quot;).
+- For Business Laws/Audit: Frame 60% practical case-scenario questions (e.g., &quot;Mr. X entered into a contract...&quot;) and 40% direct descriptive provisions, with clear mark allocations (4M, 5M, 6M).`,
+          userPrompt: `Generate an official ICAI ${currentSubject.name} Question Paper.
+Scope: ${genScope === 'full' ? `Comprehensive ${targetMarks}-Mark ICAI Pattern Exam Paper (Include Q1 Compulsory and structured sub-questions 1(a), 1(b), 2(a), 2(b), 3(a), 3(b)...)` : `Focused ${targetMarks}-Mark Practice Test Paper with 4 to 5 sub-questions (1(a), 1(b), 2(a), 2(b))`}.
+Syllabus Coverage: ${chapterInstruction}.`,
+          jsonSchema: qpSchema
+        });
+
+        setGeneratedPaper(generated);
+        setStatusBanner(null);
+
+        if (enableExamTimer) {
+          if (currentSubject.readingMins &gt; 0 &amp;&amp; genScope === 'full') {
+            setIsReadingTime(true);
+            setTimerSecondsLeft(currentSubject.readingMins * 60);
+          } else {
+            setIsReadingTime(false);
+            setTimerSecondsLeft((genScope === 'full' ? currentSubject.durationMins : 45) * 60);
+          }
+          setTimerActive(true);
+        }
+      } else {
+        // Generate Interactive MCQ Paper
+        const numQuestions = genScope === 'full' ? 20 : 10;
+        const quizSchema = {
+          type: 'OBJECT',
+          properties: {
+            title: { type: 'STRING' },
+            questions: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  qNo: { type: 'STRING' },
+                  chapter: { type: 'STRING' },
+                  question: { type: 'STRING' },
+                  options: {
+                    type: 'ARRAY',
+                    items: { type: 'STRING' }
+                  },
+                  correctIndex: { type: 'NUMBER' },
+                  explanation: { type: 'STRING' }
+                },
+                propertyOrdering: ['qNo', 'chapter', 'question', 'options', 'correctIndex', 'explanation']
+              }
+            }
+          },
+          propertyOrdering: ['title', 'questions']
+        };
+
+        const generatedQuiz = await callGeminiAPI({
+          customApiKey,
+          systemPrompt: `You are the ICAI Examination Department setting an official MCQ Question Paper for ${currentLevelObj.label} - ${currentSubject.name}.
+Every question must match ICAI Study Material, MTP, and PYQ difficulty, complete with numerical problems, conceptual application, 4 distinct options, the verified 0-based correctIndex, and a detailed ICAI solution explanation.`,
+          userPrompt: `Generate ${numQuestions} exam-grade MCQs for ${currentLevelObj.label} - ${currentSubject.name}.
+Syllabus focus: ${chapterInstruction}.`,
+          jsonSchema: quizSchema
+        });
+
+        setStatusBanner(null);
+        startQuizSession({
+          title: generatedQuiz.title || `ICAI ${currentSubject.name} - Generated Mock Test`,
+          subjectName: currentSubject.name,
+          level: currentLevelObj.label,
+          negativeMarking: currentSubject.negativeMarking ?? 0.25,
+          questions: (generatedQuiz.questions || []).map((q, idx) =&gt; ({ ...q, id: idx + 1 }))
+        });
+      }
+    } catch (err) {
+      setStatusBanner({
+        type: 'error',
+        message: `Generation failed (${err.message}). Loading pre-built ICAI paper so you can continue seamlessly.`
+      });
+      handleLoadSamplePaper();
+    } finally {
+      setIsGeneratingPaper(false);
+    }
+  };
+
+  // ==========================================
+  // INTERACTIVE MCQ QUIZ ENGINE FUNCTIONS
+  // ==========================================
+  const startQuizSession = (quizObj) =&gt; {
+    setActiveQuiz(quizObj);
+    setCurrentQIndex(0);
+    setUserResponses({});
+    setMarkedForReview({});
+    setShowReviewDrawer(false);
+    setQuizResult(null);
+    setQuizElapsedSeconds(0);
+  };
+
+  const handleSelectOption = (qIdx, optIdx) =&gt; {
+    if (quizResult) return;
+    setUserResponses((prev) =&gt; ({
+      ...prev,
+      [qIdx]: optIdx
+    }));
+  };
+
+  const handleClearOption = (qIdx) =&gt; {
+    if (quizResult) return;
+    setUserResponses((prev) =&gt; {
+      const copy = { ...prev };
+      delete copy[qIdx];
+      return copy;
+    });
+  };
+
+  const handleToggleMarkReview = (qIdx) =&gt; {
+    setMarkedForReview((prev) =&gt; ({
+      ...prev,
+      [qIdx]: !prev[qIdx]
+    }));
+  };
+
+  const handleSubmitQuizFinal = () =&gt; {
+    if (!activeQuiz) return;
+    const neg = activeQuiz.negativeMarking ?? 0.25;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let unattemptedCount = 0;
+
+    activeQuiz.questions.forEach((q, idx) =&gt; {
+      const chosen = userResponses[idx];
+      if (chosen === undefined || chosen === null) {
+        unattemptedCount++;
+      } else if (chosen === q.correctIndex) {
+        correctCount++;
+      } else {
+        wrongCount++;
+      }
+    });
+
+    const rawMarks = correctCount * 1;
+    const negativeDeducted = +(wrongCount * neg).toFixed(2);
+    const netMarks = +(rawMarks - negativeDeducted).toFixed(2);
+    const maxMarks = activeQuiz.questions.length;
+    const percentage = Math.max(0, Math.round((netMarks / maxMarks) * 100));
+
+    const resultPayload = {
+      title: activeQuiz.title,
+      subjectName: activeQuiz.subjectName,
+      level: activeQuiz.level,
+      negativeMarking: neg,
+      totalQuestions: maxMarks,
+      correctCount,
+      wrongCount,
+      unattemptedCount,
+      rawMarks,
+      negativeDeducted,
+      netMarks,
+      maxMarks,
+      percentage,
+      timeTakenSecs: quizElapsedSeconds,
+      questions: activeQuiz.questions,
+      userResponses: { ...userResponses }
+    };
+
+    setQuizResult(resultPayload);
+    setShowReviewDrawer(false);
+
+    saveToHistory({
+      id: 'quiz_' + Date.now(),
+      timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
+      mode: 'MCQ Exam Quiz',
+      level: activeQuiz.level,
+      subjectName: activeQuiz.subjectName,
+      title: activeQuiz.title,
+      score: netMarks,
+      maxScore: maxMarks,
+      percentage,
+      data: resultPayload
+    });
+  };
+
+  // ==========================================
+  // PRINT / DOWNLOAD GENERATED QUESTION PAPER
+  // ==========================================
+  const handleDownloadPaperText = (paper) =&gt; {
+    if (!paper) return;
+    const lines = [
+      `============================================================`,
+      `${paper.title || 'ICAI PRACTICE QUESTION PAPER'}`,
+      `Total Marks: ${paper.totalMarks}`,
+      `============================================================`,
+      `INSTRUCTIONS:\n${paper.instructions || 'Attempt all compulsory questions. Working notes form part of the answer.'}\n`,
+      `------------------------------------------------------------`
+    ];
+    (paper.questions || []).forEach((q) =&gt; {
+      lines.push(`\nQuestion ${q.qNo}  [${q.marks} Marks]\n${q.text}\n`);
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(paper.title || 'ICAI_Paper').replace(/\s+/g, '_')}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // ==========================================
+  // THEME TOKENS (STRICT CLAUDE EDITORIAL STYLE)
+  // ==========================================
+  const theme = darkMode
+    ? {
+        bg: 'bg-[#141413]',
+        card: 'bg-[#1F1E1C]',
+        cardElevated: 'bg-[#262522]',
+        border: 'border-[#2E2D2A]',
+        textPrimary: 'text-[#ECE9E2]',
+        textSecondary: 'text-[#9A9891]',
+        accentBg: 'bg-[#D97757]',
+        accentHover: 'hover:bg-[#C66647]',
+        accentText: 'text-[#D97757]',
+        accentSoft: 'bg-[#D97757]/15 text-[#E88B6C] border-[#D97757]/30',
+        inputBg: 'bg-[#181715]',
+        navBg: 'bg-[#1A1917]/95'
+      }
+    : {
+        bg: 'bg-[#FAF9F5]',
+        card: 'bg-[#F3F1EC]',
+        cardElevated: 'bg-[#FFFFFF]',
+        border: 'border-[#E5E2DC]',
+        textPrimary: 'text-[#191918]',
+        textSecondary: 'text-[#6B6963]',
+        accentBg: 'bg-[#D97757]',
+        accentHover: 'hover:bg-[#C46647]',
+        accentText: 'text-[#D97757]',
+        accentSoft: 'bg-[#D97757]/12 text-[#B8593B] border-[#D97757]/25',
+        inputBg: 'bg-[#FFFFFF]',
+        navBg: 'bg-[#FAF9F5]/95'
+      };
+
+  // ==========================================
+  // RENDER: INTERACTIVE MCQ QUIZ FULL-SCREEN VIEW
+  // ==========================================
+  if (activeQuiz) {
+    const questions = activeQuiz.questions || [];
+    const currentQ = questions[currentQIndex] || questions[0];
+    const attemptedCount = Object.keys(userResponses).length;
+    const reviewCount = Object.values(markedForReview).filter(Boolean).length;
+    const skippedCount = questions.length - attemptedCount;
+
+    return (
+      &lt;div className={`min-h-screen ${theme.bg} ${theme.textPrimary} flex flex-col font-sans transition-colors duration-200`}&gt;
+        {/* Inject Editorial Fonts */}
+        &lt;style&gt;{`
+          @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap');
+          .font-serif-claude { font-family: 'Newsreader', 'Instrument Serif', Georgia, serif; }
+          .font-sans-claude { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+          .font-mono-claude { font-family: 'JetBrains Mono', monospace; }
+        `}&lt;/style&gt;
+
+        {/* Top Exam Header */}
+        &lt;header className={`sticky top-0 z-30 border-b ${theme.border} ${theme.navBg} backdrop-blur-md px-4 py-3`}&gt;
+          &lt;div className=&quot;max-w-3xl mx-auto flex items-center justify-between gap-2&quot;&gt;
+            &lt;div className=&quot;flex items-center gap-2.5 min-w-0&quot;&gt;
+              &lt;button
+                onClick={() =&gt; {
+                  setActiveQuiz(null);
+                  setQuizResult(null);
+                }}
+                className={`p-2 rounded-xl border ${theme.border} ${theme.card} hover:opacity-80 transition`}
+                title=&quot;Exit Quiz&quot;
+              &gt;
+                &lt;ChevronLeft className=&quot;w-4 h-4&quot; /&gt;
+              &lt;/button&gt;
+              &lt;div className=&quot;truncate&quot;&gt;
+                &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                  &lt;span className={`text-[11px] font-mono-claude uppercase tracking-wider px-2 py-0.5 rounded-md border ${theme.accentSoft}`}&gt;
+                    {activeQuiz.level}
+                  &lt;/span&gt;
+                  &lt;span className={`text-xs ${theme.textSecondary} truncate`}&gt;
+                    {activeQuiz.negativeMarking &gt; 0 ? `+1 / -${activeQuiz.negativeMarking} Marks` : '+1 Mark (No Neg)'}
+                  &lt;/span&gt;
+                &lt;/div&gt;
+                &lt;h1 className=&quot;font-serif-claude text-base sm:text-lg font-medium truncate mt-0.5&quot;&gt;
+                  {activeQuiz.title}
+                &lt;/h1&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            &lt;div className=&quot;flex items-center gap-2 shrink-0&quot;&gt;
+              {!quizResult &amp;&amp; (
+                &lt;div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border ${theme.border} ${theme.card} font-mono-claude text-xs`}&gt;
+                  &lt;Clock className=&quot;w-3.5 h-3.5 text-[#D97757]&quot; /&gt;
+                  &lt;span&gt;{formatTime(quizElapsedSeconds)}&lt;/span&gt;
+                &lt;/div&gt;
+              )}
+              {!quizResult &amp;&amp; (
+                &lt;button
+                  onClick={() =&gt; setShowReviewDrawer(true)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium border ${theme.border} ${theme.cardElevated} flex items-center gap-1.5 shadow-sm`}
+                &gt;
+                  &lt;ListChecks className=&quot;w-4 h-4 text-[#D97757]&quot; /&gt;
+                  &lt;span&gt;Review ({attemptedCount}/{questions.length})&lt;/span&gt;
+                &lt;/button&gt;
+              )}
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/header&gt;
+
+        {/* Main Quiz Body OR Post-Submission Scorecard */}
+        &lt;main className=&quot;flex-1 max-w-3xl w-full mx-auto px-4 py-5 pb-28&quot;&gt;
+          {!quizResult ? (
+            &lt;div className=&quot;space-y-5&quot;&gt;
+              {/* Question Progress Strip */}
+              &lt;div className=&quot;flex items-center justify-between text-xs&quot;&gt;
+                &lt;span className={`font-mono-claude ${theme.textSecondary}`}&gt;
+                  QUESTION {currentQIndex + 1} OF {questions.length}
+                &lt;/span&gt;
+                {currentQ.chapter &amp;&amp; (
+                  &lt;span className={`px-2.5 py-0.5 rounded-full border ${theme.border} ${theme.card} ${theme.textSecondary} truncate max-w-[220px] sm:max-w-xs`}&gt;
+                    {currentQ.chapter}
+                  &lt;/span&gt;
+                )}
+              &lt;/div&gt;
+
+              {/* Question Number Quick Pills */}
+              &lt;div className=&quot;flex items-center gap-1.5 overflow-x-auto pb-1.5 no-scrollbar&quot;&gt;
+                {questions.map((q, idx) =&gt; {
+                  const isAnswered = userResponses[idx] !== undefined;
+                  const isReview = markedForReview[idx];
+                  const isCurrent = idx === currentQIndex;
+                  return (
+                    &lt;button
+                      key={idx}
+                      onClick={() =&gt; setCurrentQIndex(idx)}
+                      className={`w-8 h-8 rounded-lg font-mono-claude text-xs font-medium shrink-0 flex items-center justify-center border transition-all ${
+                        isCurrent
+                          ? 'ring-2 ring-[#D97757] border-[#D97757] font-bold'
+                          : theme.border
+                      } ${
+                        isReview
+                          ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/40'
+                          : isAnswered
+                          ? 'bg-emerald-600/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40'
+                          : theme.card
+                      }`}
+                    &gt;
+                      {idx + 1}
+                    &lt;/button&gt;
+                  );
+                })}
+              &lt;/div&gt;
+
+              {/* Question Statement Card */}
+              &lt;div className={`p-5 sm:p-6 rounded-2xl border ${theme.border} ${theme.cardElevated} shadow-sm space-y-5`}&gt;
+                &lt;div className=&quot;flex items-start justify-between gap-3&quot;&gt;
+                  &lt;span className=&quot;font-mono-claude text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#D97757]/15 text-[#D97757]&quot;&gt;
+                    {currentQ.qNo || `Q${currentQIndex + 1}`}
+                  &lt;/span&gt;
+                  &lt;button
+                    onClick={() =&gt; handleToggleMarkReview(currentQIndex)}
+                    className={`flex items-center gap-1.5 text-xs px-3 py-1 rounded-lg border transition ${
+                      markedForReview[currentQIndex]
+                        ? 'bg-amber-500/20 border-amber-500/50 text-amber-600 dark:text-amber-400 font-medium'
+                        : `${theme.border} ${theme.textSecondary}`
+                    }`}
+                  &gt;
+                    &lt;Flag className=&quot;w-3.5 h-3.5&quot; /&gt;
+                    &lt;span&gt;{markedForReview[currentQIndex] ? 'Marked for Review' : 'Mark for Review'}&lt;/span&gt;
+                  &lt;/button&gt;
+                &lt;/div&gt;
+
+                &lt;p className=&quot;font-serif-claude text-lg sm:text-xl leading-relaxed whitespace-pre-line&quot;&gt;
+                  {currentQ.question}
+                &lt;/p&gt;
+
+                {/* Options List */}
+                &lt;div className=&quot;space-y-2.5 pt-2&quot;&gt;
+                  {(currentQ.options || []).map((optText, optIdx) =&gt; {
+                    const isSelected = userResponses[currentQIndex] === optIdx;
+                    const optionLabel = ['A', 'B', 'C', 'D'][optIdx] || optIdx + 1;
+
+                    return (
+                      &lt;button
+                        key={optIdx}
+                        onClick={() =&gt; handleSelectOption(currentQIndex, optIdx)}
+                        className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-start gap-3.5 ${
+                          isSelected
+                            ? 'border-[#D97757] bg-[#D97757]/12 shadow-sm'
+                            : `${theme.border} ${theme.card} hover:opacity-90`
+                        }`}
+                      &gt;
+                        &lt;span
+                          className={`w-7 h-7 rounded-lg font-mono-claude text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5 ${
+                            isSelected
+                              ? 'bg-[#D97757] text-white'
+                              : `border ${theme.border} ${theme.cardElevated}`
+                          }`}
+                        &gt;
+                          {optionLabel}
+                        &lt;/span&gt;
+                        &lt;span className=&quot;text-sm sm:text-base leading-relaxed flex-1&quot;&gt;
+                          {optText}
+                        &lt;/span&gt;
+                      &lt;/button&gt;
+                    );
+                  })}
+                &lt;/div&gt;
+
+                {/* Clear Response Row */}
+                &lt;div className=&quot;flex items-center justify-between pt-2 border-t border-dashed border-[#E5E2DC] dark:border-[#2E2D2A]&quot;&gt;
+                  &lt;button
+                    onClick={() =&gt; handleClearOption(currentQIndex)}
+                    disabled={userResponses[currentQIndex] === undefined}
+                    className={`text-xs flex items-center gap-1.5 ${
+                      userResponses[currentQIndex] !== undefined
+                        ? 'text-[#D97757] hover:underline'
+                        : `${theme.textSecondary} opacity-40 cursor-not-allowed`
+                    }`}
+                  &gt;
+                    &lt;RotateCcw className=&quot;w-3.5 h-3.5&quot; /&gt;
+                    &lt;span&gt;Clear Selected Response&lt;/span&gt;
+                  &lt;/button&gt;
+                  &lt;span className={`text-xs font-mono-claude ${theme.textSecondary}`}&gt;
+                    {userResponses[currentQIndex] !== undefined
+                      ? `Selected: Option ${['A', 'B', 'C', 'D'][userResponses[currentQIndex]]}`
+                      : 'Not Attempted'}
+                  &lt;/span&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+
+              {/* Bottom Navigation Controls for Quiz */}
+              &lt;div className=&quot;flex items-center justify-between gap-3 pt-2&quot;&gt;
+                &lt;button
+                  onClick={() =&gt; setCurrentQIndex((i) =&gt; Math.max(0, i - 1))}
+                  disabled={currentQIndex === 0}
+                  className={`px-4 py-3 rounded-xl border ${theme.border} ${theme.card} text-sm font-medium flex items-center gap-1.5 disabled:opacity-40`}
+                &gt;
+                  &lt;ChevronLeft className=&quot;w-4 h-4&quot; /&gt;
+                  &lt;span&gt;Previous&lt;/span&gt;
+                &lt;/button&gt;
+
+                &lt;button
+                  onClick={() =&gt; setShowReviewDrawer(true)}
+                  className={`px-4 py-3 rounded-xl border border-[#D97757]/40 bg-[#D97757]/10 text-[#D97757] text-sm font-semibold flex items-center gap-2`}
+                &gt;
+                  &lt;Eye className=&quot;w-4 h-4&quot; /&gt;
+                  &lt;span&gt;Check Answers &amp; Submit&lt;/span&gt;
+                &lt;/button&gt;
+
+                {currentQIndex &lt; questions.length - 1 ? (
+                  &lt;button
+                    onClick={() =&gt; setCurrentQIndex((i) =&gt; Math.min(questions.length - 1, i + 1))}
+                    className={`px-5 py-3 rounded-xl ${theme.accentBg} text-white text-sm font-medium flex items-center gap-1.5 shadow-sm`}
+                  &gt;
+                    &lt;span&gt;Next&lt;/span&gt;
+                    &lt;ChevronRight className=&quot;w-4 h-4&quot; /&gt;
+                  &lt;/button&gt;
+                ) : (
+                  &lt;button
+                    onClick={() =&gt; setShowReviewDrawer(true)}
+                    className={`px-5 py-3 rounded-xl ${theme.accentBg} text-white text-sm font-semibold flex items-center gap-1.5 shadow-sm`}
+                  &gt;
+                    &lt;span&gt;Finish Review&lt;/span&gt;
+                    &lt;CheckCircle2 className=&quot;w-4 h-4&quot; /&gt;
+                  &lt;/button&gt;
+                )}
+              &lt;/div&gt;
+            &lt;/div&gt;
+          ) : (
+            /* ==========================================
+               POST-SUBMISSION ICAI QUIZ SCORECARD &amp; EXPLANATIONS
+               ========================================== */
+            &lt;div className=&quot;space-y-6 animate-fadeIn&quot;&gt;
+              {/* Top Result Summary Banner */}
+              &lt;div className={`p-6 rounded-2xl border ${theme.border} ${theme.cardElevated} shadow-sm space-y-5`}&gt;
+                &lt;div className=&quot;flex flex-wrap items-center justify-between gap-4&quot;&gt;
+                  &lt;div&gt;
+                    &lt;span className={`text-xs font-mono-claude uppercase tracking-wider px-2.5 py-1 rounded-md border ${theme.accentSoft}`}&gt;
+                      ICAI OMR Evaluation Complete
+                    &lt;/span&gt;
+                    &lt;h2 className=&quot;font-serif-claude text-2xl sm:text-3xl font-medium mt-2&quot;&gt;
+                      {quizResult.title}
+                    &lt;/h2&gt;
+                    &lt;p className={`text-xs ${theme.textSecondary} mt-1`}&gt;
+                      Time Taken: {formatTime(quizResult.timeTakenSecs)} â¢ Negative Marking: -{quizResult.negativeMarking} per wrong answer
+                    &lt;/p&gt;
+                  &lt;/div&gt;
+
+                  &lt;div className={`px-5 py-4 rounded-2xl border ${theme.border} ${theme.card} text-center min-w-[140px]`}&gt;
+                    &lt;div className=&quot;text-xs font-mono-claude uppercase text-[#D97757]&quot;&gt;Net ICAI Score&lt;/div&gt;
+                    &lt;div className=&quot;font-mono-claude text-3xl font-bold mt-1&quot;&gt;
+                      {quizResult.netMarks} &lt;span className={`text-base font-normal ${theme.textSecondary}`}&gt;/ {quizResult.maxMarks}&lt;/span&gt;
+                    &lt;/div&gt;
+                    &lt;div className={`text-xs font-medium mt-1 ${quizResult.percentage &gt;= 50 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600'}`}&gt;
+                      {quizResult.percentage}% ({quizResult.percentage &gt;= 50 ? 'PASS - ICAI 50% Criteria' : 'Needs Revision'})
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+
+                {/* 4 Metric Pills */}
+                &lt;div className=&quot;grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2&quot;&gt;
+                  &lt;div className={`p-3 rounded-xl border ${theme.border} ${theme.card}`}&gt;
+                    &lt;div className={`text-xs ${theme.textSecondary}`}&gt;Correct (+1.00)&lt;/div&gt;
+                    &lt;div className=&quot;font-mono-claude text-lg font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5&quot;&gt;
+                      {quizResult.correctCount} (+{quizResult.rawMarks})
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                  &lt;div className={`p-3 rounded-xl border ${theme.border} ${theme.card}`}&gt;
+                    &lt;div className={`text-xs ${theme.textSecondary}`}&gt;Incorrect (-{quizResult.negativeMarking})&lt;/div&gt;
+                    &lt;div className=&quot;font-mono-claude text-lg font-semibold text-rose-600 dark:text-rose-400 mt-0.5&quot;&gt;
+                      {quizResult.wrongCount} (-{quizResult.negativeDeducted})
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                  &lt;div className={`p-3 rounded-xl border ${theme.border} ${theme.card}`}&gt;
+                    &lt;div className={`text-xs ${theme.textSecondary}`}&gt;Skipped (0.00)&lt;/div&gt;
+                    &lt;div className=&quot;font-mono-claude text-lg font-semibold mt-0.5&quot;&gt;
+                      {quizResult.unattemptedCount}
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                  &lt;div className={`p-3 rounded-xl border ${theme.border} ${theme.card}`}&gt;
+                    &lt;div className={`text-xs ${theme.textSecondary}`}&gt;Accuracy Rate&lt;/div&gt;
+                    &lt;div className=&quot;font-mono-claude text-lg font-semibold text-[#D97757] mt-0.5&quot;&gt;
+                      {quizResult.correctCount + quizResult.wrongCount &gt; 0
+                        ? Math.round((quizResult.correctCount / (quizResult.correctCount + quizResult.wrongCount)) * 100)
+                        : 0}%
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;flex flex-wrap gap-2.5 pt-1&quot;&gt;
+                  &lt;button
+                    onClick={() =&gt; startQuizSession(activeQuiz)}
+                    className={`px-4 py-2.5 rounded-xl border ${theme.border} ${theme.card} text-xs font-semibold flex items-center gap-1.5`}
+                  &gt;
+                    &lt;RotateCcw className=&quot;w-3.5 h-3.5&quot; /&gt;
+                    &lt;span&gt;Re-attempt Paper&lt;/span&gt;
+                  &lt;/button&gt;
+                  &lt;button
+                    onClick={() =&gt; {
+                      setActiveQuiz(null);
+                      setQuizResult(null);
+                    }}
+                    className={`px-4 py-2.5 rounded-xl ${theme.accentBg} text-white text-xs font-semibold flex items-center gap-1.5`}
+                  &gt;
+                    &lt;span&gt;Back to Dashboard&lt;/span&gt;
+                  &lt;/button&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+
+              {/* Detailed Question-by-Question Explanation List */}
+              &lt;div className=&quot;space-y-4&quot;&gt;
+                &lt;h3 className=&quot;font-serif-claude text-xl font-medium px-1&quot;&gt;
+                  Question-by-Question ICAI Module Solutions
+                &lt;/h3&gt;
+
+                {quizResult.questions.map((q, idx) =&gt; {
+                  const userChoice = quizResult.userResponses[idx];
+                  const isSkipped = userChoice === undefined;
+                  const isCorrect = userChoice === q.correctIndex;
+                  const optionLetters = ['A', 'B', 'C', 'D'];
+
+                  return (
+                    &lt;div
+                      key={idx}
+                      className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-3.5`}
+                    &gt;
+                      &lt;div className=&quot;flex items-center justify-between gap-2&quot;&gt;
+                        &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                          &lt;span className=&quot;font-mono-claude text-xs font-bold px-2.5 py-1 rounded-md bg-[#D97757]/15 text-[#D97757]&quot;&gt;
+                            {q.qNo || `Q${idx + 1}`}
+                          &lt;/span&gt;
+                          {q.chapter &amp;&amp; (
+                            &lt;span className={`text-xs ${theme.textSecondary}`}&gt;{q.chapter}&lt;/span&gt;
+                          )}
+                        &lt;/div&gt;
+                        &lt;span
+                          className={`text-xs font-mono-claude font-semibold px-2.5 py-1 rounded-lg ${
+                            isSkipped
+                              ? 'bg-stone-500/15 text-stone-500'
+                              : isCorrect
+                              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                              : 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
+                          }`}
+                        &gt;
+                          {isSkipped
+                            ? 'Skipped (0M)'
+                            : isCorrect
+                            ? '+1.00 Mark'
+                            : `-${quizResult.negativeMarking} Mark`}
+                        &lt;/span&gt;
+                      &lt;/div&gt;
+
+                      &lt;p className=&quot;font-serif-claude text-base sm:text-lg leading-relaxed&quot;&gt;
+                        {q.question}
+                      &lt;/p&gt;
+
+                      &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-2&quot;&gt;
+                        {(q.options || []).map((opt, oIdx) =&gt; {
+                          const isRightOpt = oIdx === q.correctIndex;
+                          const isUserOpt = oIdx === userChoice;
+
+                          return (
+                            &lt;div
+                              key={oIdx}
+                              className={`p-3 rounded-xl border text-xs sm:text-sm flex items-start gap-2.5 ${
+                                isRightOpt
+                                  ? 'border-emerald-500/60 bg-emerald-500/10 font-medium'
+                                  : isUserOpt &amp;&amp; !isRightOpt
+                                  ? 'border-rose-500/60 bg-rose-500/10'
+                                  : `${theme.border} ${theme.card}`
+                              }`}
+                            &gt;
+                              &lt;span className=&quot;font-mono-claude font-bold shrink-0&quot;&gt;
+                                ({optionLetters[oIdx]})
+                              &lt;/span&gt;
+                              &lt;span className=&quot;flex-1&quot;&gt;{opt}&lt;/span&gt;
+                              {isRightOpt &amp;&amp; &lt;Check className=&quot;w-4 h-4 text-emerald-600 shrink-0&quot; /&gt;}
+                              {isUserOpt &amp;&amp; !isRightOpt &amp;&amp; &lt;X className=&quot;w-4 h-4 text-rose-600 shrink-0&quot; /&gt;}
+                            &lt;/div&gt;
+                          );
+                        })}
+                      &lt;/div&gt;
+
+                      {/* ICAI Explanation Box */}
+                      &lt;div className={`p-3.5 rounded-xl border ${theme.border} ${theme.card} text-xs sm:text-sm space-y-1`}&gt;
+                        &lt;div className=&quot;font-semibold text-[#D97757] flex items-center gap-1.5&quot;&gt;
+                          &lt;BookOpen className=&quot;w-3.5 h-3.5&quot; /&gt;
+                          &lt;span&gt;ICAI Study Material Explanation (Correct Answer: Option {optionLetters[q.correctIndex]})&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;p className={`${theme.textSecondary} leading-relaxed`}&gt;
+                          {q.explanation}
+                        &lt;/p&gt;
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  );
+                })}
+              &lt;/div&gt;
+            &lt;/div&gt;
+          )}
+        &lt;/main&gt;
+
+        {/* ==========================================
+            PRE-SUBMISSION REVIEW DRAWER / MODAL
+           ========================================== */}
+        {showReviewDrawer &amp;&amp; !quizResult &amp;&amp; (
+          &lt;div className=&quot;fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4&quot;&gt;
+            &lt;div className={`w-full max-w-2xl max-h-[88vh] flex flex-col rounded-t-3xl sm:rounded-3xl border ${theme.border} ${theme.cardElevated} shadow-2xl overflow-hidden`}&gt;
+              {/* Modal Header */}
+              &lt;div className={`px-5 py-4 border-b ${theme.border} flex items-center justify-between`}&gt;
+                &lt;div&gt;
+                  &lt;h3 className=&quot;font-serif-claude text-xl font-medium&quot;&gt;
+                    Pre-Submission Answer Sheet Review
+                  &lt;/h3&gt;
+                  &lt;p className={`text-xs ${theme.textSecondary}`}&gt;
+                    Verify all your attempted and skipped questions before final OMR submission
+                  &lt;/p&gt;
+                &lt;/div&gt;
+                &lt;button
+                  onClick={() =&gt; setShowReviewDrawer(false)}
+                  className={`p-2 rounded-xl border ${theme.border} ${theme.card}`}
+                &gt;
+                  &lt;X className=&quot;w-4 h-4&quot; /&gt;
+                &lt;/button&gt;
+              &lt;/div&gt;
+
+              {/* Status Summary Strip */}
+              &lt;div className={`px-5 py-3 border-b ${theme.border} ${theme.card} grid grid-cols-3 gap-2 text-center`}&gt;
+                &lt;div className=&quot;p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30&quot;&gt;
+                  &lt;div className=&quot;font-mono-claude text-base font-bold text-emerald-600 dark:text-emerald-400&quot;&gt;
+                    {attemptedCount}
+                  &lt;/div&gt;
+                  &lt;div className=&quot;text-[11px] text-emerald-700 dark:text-emerald-300&quot;&gt;Attempted&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div className=&quot;p-2 rounded-xl bg-stone-500/10 border border-stone-500/30&quot;&gt;
+                  &lt;div className=&quot;font-mono-claude text-base font-bold&quot;&gt;
+                    {skippedCount}
+                  &lt;/div&gt;
+                  &lt;div className={`text-[11px] ${theme.textSecondary}`}&gt;Unattempted / Skipped&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div className=&quot;p-2 rounded-xl bg-amber-500/10 border border-amber-500/30&quot;&gt;
+                  &lt;div className=&quot;font-mono-claude text-base font-bold text-amber-600 dark:text-amber-400&quot;&gt;
+                    {reviewCount}
+                  &lt;/div&gt;
+                  &lt;div className=&quot;text-[11px] text-amber-700 dark:text-amber-300&quot;&gt;Marked for Review&lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+
+              {/* Scrollable Question &amp; Checked Answer List */}
+              &lt;div className=&quot;flex-1 overflow-y-auto p-5 space-y-2.5&quot;&gt;
+                {questions.map((q, idx) =&gt; {
+                  const chosen = userResponses[idx];
+                  const isFlagged = markedForReview[idx];
+                  const optLetter = chosen !== undefined ? ['A', 'B', 'C', 'D'][chosen] : null;
+
+                  return (
+                    &lt;div
+                      key={idx}
+                      onClick={() =&gt; {
+                        setCurrentQIndex(idx);
+                        setShowReviewDrawer(false);
+                      }}
+                      className={`p-3.5 rounded-xl border ${theme.border} ${theme.card} hover:border-[#D97757] cursor-pointer transition flex items-center justify-between gap-3`}
+                    &gt;
+                      &lt;div className=&quot;min-w-0 flex-1&quot;&gt;
+                        &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                          &lt;span className=&quot;font-mono-claude text-xs font-bold text-[#D97757]&quot;&gt;
+                            Q{idx + 1}
+                          &lt;/span&gt;
+                          {isFlagged &amp;&amp; (
+                            &lt;span className=&quot;text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 font-medium&quot;&gt;
+                              Review Flagged
+                            &lt;/span&gt;
+                          )}
+                          &lt;span className={`text-xs truncate ${theme.textSecondary}`}&gt;
+                            {q.question}
+                          &lt;/span&gt;
+                        &lt;/div&gt;
+                        {chosen !== undefined &amp;&amp; (
+                          &lt;div className=&quot;text-xs font-medium mt-1 truncate&quot;&gt;
+                            Your Checked Answer: &lt;span className=&quot;font-mono-claude font-semibold text-emerald-600 dark:text-emerald-400&quot;&gt;Option ({optLetter})&lt;/span&gt; â {q.options?.[chosen]}
+                          &lt;/div&gt;
+                        )}
+                      &lt;/div&gt;
+
+                      &lt;div className=&quot;shrink-0 flex items-center gap-2&quot;&gt;
+                        {chosen !== undefined ? (
+                          &lt;span className=&quot;px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-mono-claude text-xs font-semibold&quot;&gt;
+                            Option {optLetter}
+                          &lt;/span&gt;
+                        ) : (
+                          &lt;span className={`px-2.5 py-1 rounded-lg border ${theme.border} text-xs ${theme.textSecondary}`}&gt;
+                            Skipped
+                          &lt;/span&gt;
+                        )}
+                        &lt;ChevronRight className={`w-4 h-4 ${theme.textSecondary}`} /&gt;
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  );
+                })}
+              &lt;/div&gt;
+
+              {/* Modal Footer */}
+              &lt;div className={`px-5 py-4 border-t ${theme.border} ${theme.card} flex items-center justify-between gap-3`}&gt;
+                &lt;button
+                  onClick={() =&gt; setShowReviewDrawer(false)}
+                  className={`px-4 py-2.5 rounded-xl border ${theme.border} ${theme.cardElevated} text-xs sm:text-sm font-medium`}
+                &gt;
+                  Return to Questions
+                &lt;/button&gt;
+                &lt;button
+                  onClick={handleSubmitQuizFinal}
+                  className={`px-6 py-2.5 rounded-xl ${theme.accentBg} text-white text-xs sm:text-sm font-semibold shadow-md flex items-center gap-2`}
+                &gt;
+                  &lt;CheckCircle2 className=&quot;w-4 h-4&quot; /&gt;
+                  &lt;span&gt;Submit Final Paper ({attemptedCount}/{questions.length})&lt;/span&gt;
+                &lt;/button&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        )}
+      &lt;/div&gt;
+    );
+  }
+
+  // ==========================================
+  // RENDER: MAIN MOBILE-FIRST APP LAYOUT
+  // ==========================================
+  return (
+    &lt;div className={`min-h-screen ${theme.bg} ${theme.textPrimary} flex flex-col font-sans-claude transition-colors duration-200`}&gt;
+      {/* Load Claude-Style Editorial Fonts */}
+      &lt;style&gt;{`
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap');
+        .font-serif-claude { font-family: 'Newsreader', 'Instrument Serif', Georgia, serif; }
+        .font-sans-claude { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+        .font-mono-claude { font-family: 'JetBrains Mono', monospace; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}&lt;/style&gt;
+
+      {/* Top App Bar */}
+      &lt;header className={`sticky top-0 z-30 border-b ${theme.border} ${theme.navBg} backdrop-blur-md px-4 py-3`}&gt;
+        &lt;div className=&quot;max-w-3xl mx-auto flex items-center justify-between&quot;&gt;
+          &lt;div className=&quot;flex items-center gap-2.5&quot;&gt;
+            &lt;div className=&quot;w-9 h-9 rounded-xl bg-[#D97757] flex items-center justify-center text-white shadow-xs&quot;&gt;
+              &lt;Scale className=&quot;w-5 h-5&quot; /&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+              &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                &lt;h1 className=&quot;font-serif-claude text-xl font-semibold tracking-tight leading-none&quot;&gt;
+                  ICAI Examiner
+                &lt;/h1&gt;
+                &lt;span className={`text-[10px] font-mono-claude uppercase px-2 py-0.5 rounded-full border ${theme.accentSoft}`}&gt;
+                  {selectedLevel}
+                &lt;/span&gt;
+              &lt;/div&gt;
+              &lt;p className={`text-[11px] ${theme.textSecondary} mt-0.5`}&gt;
+                Strict ICAI Study Material, RTP, MTP &amp; Step-Marking Evaluator
+              &lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+            {/* Active Exam Timer Pill if running */}
+            {timerActive &amp;&amp; (
+              &lt;div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#D97757]/40 bg-[#D97757]/10 font-mono-claude text-xs text-[#D97757]`}&gt;
+                &lt;Clock className=&quot;w-3.5 h-3.5 animate-pulse&quot; /&gt;
+                &lt;span&gt;{isReadingTime ? 'READ ' : ''}{formatTime(timerSecondsLeft)}&lt;/span&gt;
+              &lt;/div&gt;
+            )}
+
+            &lt;button
+              onClick={() =&gt; {
+                const next = !darkMode;
+                setDarkMode(next);
+                try {
+                  localStorage.setItem('icai_examiner_dark', String(next));
+                } catch (e) {}
+              }}
+              className={`p-2 rounded-xl border ${theme.border} ${theme.card} hover:opacity-80 transition`}
+              aria-label=&quot;Toggle Dark or Light Mode&quot;
+            &gt;
+              {darkMode ? &lt;Sun className=&quot;w-4 h-4 text-amber-400&quot; /&gt; : &lt;Moon className=&quot;w-4 h-4&quot; /&gt;}
+            &lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/header&gt;
+
+      {/* Main Content Container */}
+      &lt;main className=&quot;flex-1 max-w-3xl w-full mx-auto px-4 pt-4 pb-28 space-y-5&quot;&gt;
+        {/* GlobalCA Level &amp; Subject Selector (Visible on Mode 1 &amp; Mode 2) */}
+        {(activeTab === 'upload' || activeTab === 'generate') &amp;&amp; (
+          &lt;section className={`p-4 rounded-2xl border ${theme.border} ${theme.card} space-y-3.5`}&gt;
+            {/* Level Switcher Pills */}
+            &lt;div className=&quot;flex items-center justify-between gap-2&quot;&gt;
+              &lt;span className={`text-xs font-medium uppercase tracking-wider ${theme.textSecondary}`}&gt;
+                1. Select CA Course Level
+              &lt;/span&gt;
+              &lt;span className={`text-[11px] font-mono-claude ${theme.textSecondary}`}&gt;
+                New Scheme Syllabus
+              &lt;/span&gt;
+            &lt;/div&gt;
+
+            &lt;div className=&quot;grid grid-cols-3 gap-2&quot;&gt;
+              {Object.keys(CA_LEVELS).map((lvlKey) =&gt; {
+                const active = selectedLevel === lvlKey;
+                return (
+                  &lt;button
+                    key={lvlKey}
+                    onClick={() =&gt; handleLevelChange(lvlKey)}
+                    className={`py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-medium transition-all flex flex-col items-center justify-center ${
+                      active
+                        ? `${theme.accentBg} text-white border-[#D97757] shadow-xs`
+                        : `${theme.border} ${theme.cardElevated} hover:opacity-90`
+                    }`}
+                  &gt;
+                    &lt;span&gt;CA {lvlKey}&lt;/span&gt;
+                  &lt;/button&gt;
+                );
+              })}
+            &lt;/div&gt;
+
+            {/* Subject Cards Horizontal Scroll / Grid */}
+            &lt;div className=&quot;space-y-2 pt-1&quot;&gt;
+              &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                &lt;span className={`text-xs font-medium uppercase tracking-wider ${theme.textSecondary}`}&gt;
+                  2. Select Paper ({currentSubject.type === 'subjective' ? 'Subjective Step-Checking' : 'Interactive MCQ OMR'})
+                &lt;/span&gt;
+              &lt;/div&gt;
+
+              &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-2&quot;&gt;
+                {currentLevelObj.subjects.map((subj) =&gt; {
+                  const isSelected = subj.id === currentSubject.id;
+                  return (
+                    &lt;button
+                      key={subj.id}
+                      onClick={() =&gt; {
+                        setSelectedSubjectId(subj.id);
+                        setGenSelectedChapter('All Syllabus Chapters (ICAI Weightage)');
+                        setEvaluationReport(null);
+                        setStatusBanner(null);
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all flex items-start justify-between gap-2 ${
+                        isSelected
+                          ? `border-[#D97757] ${theme.cardElevated} ring-1 ring-[#D97757]`
+                          : `${theme.border} ${theme.cardElevated} opacity-80 hover:opacity-100`
+                      }`}
+                    &gt;
+                      &lt;div className=&quot;min-w-0&quot;&gt;
+                        &lt;div className=&quot;flex items-center gap-1.5&quot;&gt;
+                          &lt;span className=&quot;font-mono-claude text-[11px] font-semibold text-[#D97757]&quot;&gt;
+                            {subj.code}
+                          &lt;/span&gt;
+                          &lt;span
+                            className={`text-[10px] font-mono-claude px-1.5 py-0.5 rounded border ${
+                              subj.type === 'subjective'
+                                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30'
+                                : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                            }`}
+                          &gt;
+                            {subj.type === 'subjective' ? 'Subjective' : 'MCQ Quiz'}
+                          &lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div className=&quot;font-serif-claude text-base font-medium truncate mt-0.5&quot;&gt;
+                          {subj.name}
+                        &lt;/div&gt;
+                      &lt;/div&gt;
+                      &lt;div className={`font-mono-claude text-xs ${theme.textSecondary} shrink-0`}&gt;
+                        {subj.marks}M
+                      &lt;/div&gt;
+                    &lt;/button&gt;
+                  );
+                })}
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            {/* Active Subject ICAI Checking Standard Note */}
+            &lt;div className={`p-3 rounded-xl border ${theme.border} ${theme.cardElevated} flex items-start gap-2.5 text-xs`}&gt;
+              &lt;Info className=&quot;w-4 h-4 text-[#D97757] shrink-0 mt-0.5&quot; /&gt;
+              &lt;div className=&quot;space-y-0.5&quot;&gt;
+                &lt;div className=&quot;font-semibold&quot;&gt;
+                  {currentSubject.name} â ICAI Checking Standard:
+                &lt;/div&gt;
+                &lt;p className={`${theme.textSecondary} leading-relaxed`}&gt;
+                  {currentSubject.checkingRules}
+                &lt;/p&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/section&gt;
+        )}
+
+        {/* Status Notification Banner */}
+        {statusBanner &amp;&amp; (
+          &lt;div
+            className={`p-3.5 rounded-2xl border text-xs sm:text-sm flex items-start justify-between gap-3 ${
+              statusBanner.type === 'error'
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300'
+                : statusBanner.type === 'success'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+                : 'bg-[#D97757]/10 border-[#D97757]/30 text-[#D97757]'
+            }`}
+          &gt;
+            &lt;div className=&quot;flex items-start gap-2.5&quot;&gt;
+              {statusBanner.type === 'error' ? (
+                &lt;AlertCircle className=&quot;w-4 h-4 shrink-0 mt-0.5&quot; /&gt;
+              ) : statusBanner.type === 'success' ? (
+                &lt;CheckCircle2 className=&quot;w-4 h-4 shrink-0 mt-0.5&quot; /&gt;
+              ) : (
+                &lt;RefreshCw className=&quot;w-4 h-4 shrink-0 mt-0.5 animate-spin&quot; /&gt;
+              )}
+              &lt;span className=&quot;leading-relaxed&quot;&gt;{statusBanner.message}&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;button onClick={() =&gt; setStatusBanner(null)} className=&quot;opacity-70 hover:opacity-100&quot;&gt;
+              &lt;X className=&quot;w-4 h-4&quot; /&gt;
+            &lt;/button&gt;
+          &lt;/div&gt;
+        )}
+
+        {/* ==========================================
+            TAB 1: UPLOAD &amp; CHECK (SELF EVALUATION)
+           ========================================== */}
+        {activeTab === 'upload' &amp;&amp; (
+          &lt;div className=&quot;space-y-5&quot;&gt;
+            {currentSubject.type === 'subjective' ? (
+              /* SUBJECTIVE PAPER UPLOAD &amp; ANSWER SHEET CHECKING */
+              &lt;&gt;
+                {/* Step 1: Upload Question Paper PDF */}
+                &lt;div className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-4`}&gt;
+                  &lt;div className=&quot;flex items-start justify-between gap-2&quot;&gt;
+                    &lt;div&gt;
+                      &lt;span className=&quot;font-mono-claude text-[11px] uppercase tracking-wider text-[#D97757] font-semibold&quot;&gt;
+                        Step 1 of 2 â¢ Question Paper
+                      &lt;/span&gt;
+                      &lt;h2 className=&quot;font-serif-claude text-xl font-medium mt-0.5&quot;&gt;
+                        Upload {currentSubject.name} Question Paper PDF
+                      &lt;/h2&gt;
+                      &lt;p className={`text-xs ${theme.textSecondary} mt-0.5`}&gt;
+                        Upload any coaching institute or ICAI MTP/RTP/PYQ PDF. The app reads all questions, sub-question numbering, and marks.
+                      &lt;/p&gt;
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+
+                  &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-3&quot;&gt;
+                    &lt;label className={`cursor-pointer p-4 rounded-xl border-2 border-dashed ${theme.border} ${theme.card} hover:border-[#D97757] transition flex flex-col items-center justify-center text-center gap-2`}&gt;
+                      &lt;Upload className=&quot;w-6 h-6 text-[#D97757]&quot; /&gt;
+                      &lt;div&gt;
+                        &lt;div className=&quot;text-xs sm:text-sm font-semibold&quot;&gt;
+                          {isParsingQP ? 'Parsing Question Paper...' : 'Upload Question Paper (PDF / Image)'}
+                        &lt;/div&gt;
+                        &lt;div className={`text-[11px] ${theme.textSecondary}`}&gt;
+                          Detects Q1(a), Q1(b), Marks &amp; Instructions
+                        &lt;/div&gt;
+                      &lt;/div&gt;
+                      &lt;input
+                        type=&quot;file&quot;
+                        accept=&quot;.pdf,image/*&quot;
+                        onChange={handleQPUpload}
+                        className=&quot;hidden&quot;
+                        disabled={isParsingQP}
+                      /&gt;
+                    &lt;/label&gt;
+
+                    &lt;button
+                      onClick={handleLoadSamplePaper}
+                      className={`p-4 rounded-xl border ${theme.border} ${theme.card} hover:border-[#D97757] transition flex flex-col items-center justify-center text-center gap-2`}
+                    &gt;
+                      &lt;FileCheck className=&quot;w-6 h-6 text-[#D97757]&quot; /&gt;
+                      &lt;div&gt;
+                        &lt;div className=&quot;text-xs sm:text-sm font-semibold&quot;&gt;
+                          Load Pre-Built ICAI Sample Paper
+                        &lt;/div&gt;
+                        &lt;div className={`text-[11px] ${theme.textSecondary}`}&gt;
+                          Instant test with sample {currentSubject.name} paper + answer sheet
+                        &lt;/div&gt;
+                      &lt;/div&gt;
+                    &lt;/button&gt;
+                  &lt;/div&gt;
+
+                  {/* Display Parsed Question Paper Breakdown */}
+                  {parsedQuestionPaper &amp;&amp; (
+                    &lt;div className={`p-4 rounded-xl border ${theme.border} ${theme.card} space-y-3`}&gt;
+                      &lt;div className=&quot;flex items-center justify-between gap-2 border-b pb-2.5 border-[#E5E2DC] dark:border-[#2E2D2A]&quot;&gt;
+                        &lt;div&gt;
+                          &lt;div className=&quot;font-serif-claude text-base font-semibold&quot;&gt;
+                            {parsedQuestionPaper.title}
+                          &lt;/div&gt;
+                          &lt;div className={`text-xs ${theme.textSecondary}`}&gt;
+                            {parsedQuestionPaper.instructions}
+                          &lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;span className=&quot;font-mono-claude text-xs font-bold px-2.5 py-1 rounded-lg bg-[#D97757]/15 text-[#D97757] shrink-0&quot;&gt;
+                          {parsedQuestionPaper.totalMarks} Marks
+                        &lt;/span&gt;
+                      &lt;/div&gt;
+
+                      &lt;div className=&quot;space-y-2 max-h-60 overflow-y-auto pr-1&quot;&gt;
+                        {(parsedQuestionPaper.questions || []).map((q, idx) =&gt; (
+                          &lt;div
+                            key={idx}
+                            className={`p-3 rounded-lg border ${theme.border} ${theme.cardElevated} text-xs space-y-1`}
+                          &gt;
+                            &lt;div className=&quot;flex items-center justify-between font-mono-claude font-semibold&quot;&gt;
+                              &lt;span className=&quot;text-[#D97757]&quot;&gt;Question {q.qNo}&lt;/span&gt;
+                              &lt;span&gt;[{q.marks} Marks]&lt;/span&gt;
+                            &lt;/div&gt;
+                            &lt;p className=&quot;whitespace-pre-line leading-relaxed&quot;&gt;{q.text}&lt;/p&gt;
+                          &lt;/div&gt;
+                        ))}
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  )}
+                &lt;/div&gt;
+
+                {/* Step 2: Upload Handwritten Answer Sheet (Photos or PDF) */}
+                &lt;div className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-4`}&gt;
+                  &lt;div className=&quot;flex items-center justify-between gap-2&quot;&gt;
+                    &lt;div&gt;
+                      &lt;span className=&quot;font-mono-claude text-[11px] uppercase tracking-wider text-[#D97757] font-semibold&quot;&gt;
+                        Step 2 of 2 â¢ Your Written Answer Sheet
+                      &lt;/span&gt;
+                      &lt;h2 className=&quot;font-serif-claude text-xl font-medium mt-0.5&quot;&gt;
+                        Upload Handwritten Answer Sheet (Images or PDF)
+                      &lt;/h2&gt;
+                      &lt;p className={`text-xs ${theme.textSecondary} mt-0.5`}&gt;
+                        Take clear photos of your register pages or upload a scanned PDF in order of questions attempted.
+                      &lt;/p&gt;
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+
+                  &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-3&quot;&gt;
+                    &lt;label className={`cursor-pointer p-4 rounded-xl border-2 border-dashed ${theme.border} ${theme.card} hover:border-[#D97757] transition flex flex-col items-center justify-center text-center gap-2`}&gt;
+                      &lt;Camera className=&quot;w-6 h-6 text-[#D97757]&quot; /&gt;
+                      &lt;div&gt;
+                        &lt;div className=&quot;text-xs sm:text-sm font-semibold&quot;&gt;
+                          Upload Answer Sheet Photos / PDF
+                        &lt;/div&gt;
+                        &lt;div className={`text-[11px] ${theme.textSecondary}`}&gt;
+                          Select multiple JPG/PNG photos or 1 scanned PDF
+                        &lt;/div&gt;
+                      &lt;/div&gt;
+                      &lt;input
+                        type=&quot;file&quot;
+                        accept=&quot;.pdf,image/*&quot;
+                        multiple
+                        onChange={(e) =&gt; handleAnswerSheetUpload(e, false)}
+                        className=&quot;hidden&quot;
+                      /&gt;
+                    &lt;/label&gt;
+
+                    &lt;button
+                      onClick={() =&gt; setShowManualTextToggle(!showManualTextToggle)}
+                      className={`p-4 rounded-xl border ${theme.border} ${theme.card} hover:border-[#D97757] transition flex flex-col items-center justify-center text-center gap-2`}
+                    &gt;
+                      &lt;FileText className=&quot;w-6 h-6 text-[#D97757]&quot; /&gt;
+                      &lt;div&gt;
+                        &lt;div className=&quot;text-xs sm:text-sm font-semibold&quot;&gt;
+                          {showManualTextToggle ? 'Hide Answer Transcript Editor' : 'View / Edit Answer Text Transcript'}
+                        &lt;/div&gt;
+                        &lt;div className={`text-[11px] ${theme.textSecondary}`}&gt;
+                          Type or inspect extracted handwritten answers
+                        &lt;/div&gt;
+                      &lt;/div&gt;
+                    &lt;/button&gt;
+                  &lt;/div&gt;
+
+                  {/* Preview Uploaded Answer Sheet Pages */}
+                  {answerSheetFiles.length &gt; 0 &amp;&amp; (
+                    &lt;div className=&quot;space-y-2&quot;&gt;
+                      &lt;div className=&quot;flex items-center justify-between text-xs&quot;&gt;
+                        &lt;span className=&quot;font-semibold&quot;&gt;
+                          Uploaded Answer Sheet Pages ({answerSheetFiles.length})
+                        &lt;/span&gt;
+                        &lt;button
+                          onClick={() =&gt; setAnswerSheetFiles([])}
+                          className=&quot;text-rose-500 hover:underline flex items-center gap-1&quot;
+                        &gt;
+                          &lt;Trash2 className=&quot;w-3.5 h-3.5&quot; /&gt;
+                          &lt;span&gt;Clear All&lt;/span&gt;
+                        &lt;/button&gt;
+                      &lt;/div&gt;
+                      &lt;div className=&quot;grid grid-cols-2 sm:grid-cols-3 gap-2.5&quot;&gt;
+                        {answerSheetFiles.map((file, idx) =&gt; (
+                          &lt;div
+                            key={idx}
+                            className={`p-2.5 rounded-xl border ${theme.border} ${theme.card} flex items-center justify-between gap-2`}
+                          &gt;
+                            &lt;div className=&quot;flex items-center gap-2 min-w-0&quot;&gt;
+                              {file.previewUrl ? (
+                                &lt;img
+                                  src={file.previewUrl}
+                                  alt={file.name}
+                                  className=&quot;w-10 h-10 rounded-lg object-cover border&quot;
+                                /&gt;
+                              ) : (
+                                &lt;div className=&quot;w-10 h-10 rounded-lg bg-[#D97757]/15 text-[#D97757] flex items-center justify-center font-mono-claude text-xs font-bold&quot;&gt;
+                                  PDF
+                                &lt;/div&gt;
+                              )}
+                              &lt;div className=&quot;min-w-0&quot;&gt;
+                                &lt;div className=&quot;text-xs font-medium truncate&quot;&gt;Page {idx + 1}&lt;/div&gt;
+                                &lt;div className={`text-[10px] ${theme.textSecondary}`}&gt;{file.sizeKB} KB&lt;/div&gt;
+                              &lt;/div&gt;
+                            &lt;/div&gt;
+                            &lt;button
+                              onClick={() =&gt;
+                                setAnswerSheetFiles((prev) =&gt; prev.filter((_, i) =&gt; i !== idx))
+                              }
+                              className=&quot;p-1 text-rose-500 hover:bg-rose-500/10 rounded&quot;
+                            &gt;
+                              &lt;X className=&quot;w-3.5 h-3.5&quot; /&gt;
+                            &lt;/button&gt;
+                          &lt;/div&gt;
+                        ))}
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  )}
+
+                  {/* Optional Manual/Sample Answer Transcript Box */}
+                  {showManualTextToggle &amp;&amp; (
+                    &lt;div className=&quot;space-y-1.5&quot;&gt;
+                      &lt;label className={`text-xs font-medium ${theme.textSecondary}`}&gt;
+                        Written Answer Sheet Transcript (Used alongside or in place of photos):
+                      &lt;/label&gt;
+                      &lt;textarea
+                        rows={6}
+                        value={manualAnswerText}
+                        onChange={(e) =&gt; setManualAnswerText(e.target.value)}
+                        placeholder=&quot;Write or paste your answers numbered as Ans 1(a), Ans 1(b)...&quot;
+                        className={`w-full p-3.5 rounded-xl border ${theme.border} ${theme.inputBg} font-mono-claude text-xs leading-relaxed focus:outline-none focus:border-[#D97757]`}
+                      /&gt;
+                    &lt;/div&gt;
+                  )}
+
+                  {/* Evaluate CTA Button */}
+                  &lt;button
+                    onClick={() =&gt;
+                      handleEvaluateSubjective(
+                        parsedQuestionPaper,
+                        answerSheetFiles,
+                        manualAnswerText
+                      )
+                    }
+                    disabled={isEvaluating}
+                    className={`w-full py-3.5 px-5 rounded-xl ${theme.accentBg} ${theme.accentHover} text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50`}
+                  &gt;
+                    {isEvaluating ? (
+                      &lt;&gt;
+                        &lt;RefreshCw className=&quot;w-4 h-4 animate-spin&quot; /&gt;
+                        &lt;span&gt;Checking Answer Sheet by ICAI Standards...&lt;/span&gt;
+                      &lt;/&gt;
+                    ) : (
+                      &lt;&gt;
+                        &lt;Sparkles className=&quot;w-4 h-4&quot; /&gt;
+                        &lt;span&gt;Evaluate Answer Sheet by Strict ICAI Standards&lt;/span&gt;
+                      &lt;/&gt;
+                    )}
+                  &lt;/button&gt;
+                &lt;/div&gt;
+              &lt;/&gt;
+            ) : (
+              /* OBJECTIVE / MCQ PAPER UPLOAD -&gt; CONVERT TO INTERACTIVE QUIZ */
+              &lt;div className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-4`}&gt;
+                &lt;div&gt;
+                  &lt;span className=&quot;font-mono-claude text-[11px] uppercase tracking-wider text-[#D97757] font-semibold&quot;&gt;
+                    PDF-to-OMR Quiz Engine â¢ {currentSubject.code}
+                  &lt;/span&gt;
+                  &lt;h2 className=&quot;font-serif-claude text-xl font-medium mt-0.5&quot;&gt;
+                    Convert {currentSubject.name} Question Paper PDF into Interactive Quiz
+                  &lt;/h2&gt;
+                  &lt;p className={`text-xs ${theme.textSecondary} mt-1 leading-relaxed`}&gt;
+                    Upload any coaching or ICAI MTP/PYQ Question Paper PDF for {currentSubject.name}. The app firsthand solves all questions according to ICAI modules, puts them into an exam quiz, lets you review attempted/skipped questions before submitting, and grades with +{1} / -{currentSubject.negativeMarking} marking.
+                  &lt;/p&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1&quot;&gt;
+                  &lt;label className={`cursor-pointer p-5 rounded-xl border-2 border-dashed ${theme.border} ${theme.card} hover:border-[#D97757] transition flex flex-col items-center justify-center text-center gap-2.5`}&gt;
+                    &lt;Upload className=&quot;w-7 h-7 text-[#D97757]&quot; /&gt;
+                    &lt;div&gt;
+                      &lt;div className=&quot;text-sm font-semibold&quot;&gt;
+                        {isParsingQP ? 'Converting PDF into Quiz...' : 'Upload MCQ Question Paper PDF'}
+                      &lt;/div&gt;
+                      &lt;div className={`text-xs ${theme.textSecondary} mt-0.5`}&gt;
+                        Auto-extracts questions, options &amp; ICAI solutions
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;input
+                      type=&quot;file&quot;
+                      accept=&quot;.pdf,image/*&quot;
+                      onChange={handleQPUpload}
+                      className=&quot;hidden&quot;
+                      disabled={isParsingQP}
+                    /&gt;
+                  &lt;/label&gt;
+
+                  &lt;button
+                    onClick={handleLoadSamplePaper}
+                    className={`p-5 rounded-xl border ${theme.border} ${theme.card} hover:border-[#D97757] transition flex flex-col items-center justify-center text-center gap-2.5`}
+                  &gt;
+                    &lt;Play className=&quot;w-7 h-7 text-[#D97757]&quot; /&gt;
+                    &lt;div&gt;
+                      &lt;div className=&quot;text-sm font-semibold&quot;&gt;
+                        Launch Sample ICAI {currentSubject.name} Quiz
+                      &lt;/div&gt;
+                      &lt;div className={`text-xs ${theme.textSecondary} mt-0.5`}&gt;
+                        Test the OMR Quiz, Review Palette &amp; Explanations now
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  &lt;/button&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            )}
+
+            {/* Render Detailed ICAI Subjective Evaluation Scorecard if present */}
+            {evaluationReport &amp;&amp; (
+              &lt;SubjectiveScorecardView
+                report={evaluationReport}
+                theme={theme}
+                onClose={() =&gt; setEvaluationReport(null)}
+              /&gt;
+            )}
+          &lt;/div&gt;
+        )}
+
+        {/* ==========================================
+            TAB 2: GENERATE ICAI QUESTION PAPER (MODE 2)
+           ========================================== */}
+        {activeTab === 'generate' &amp;&amp; (
+          &lt;div className=&quot;space-y-5&quot;&gt;
+            &lt;div className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-4`}&gt;
+              &lt;div&gt;
+                &lt;span className=&quot;font-mono-claude text-[11px] uppercase tracking-wider text-[#D97757] font-semibold&quot;&gt;
+                  AI ICAI Examiner Paper Setter
+                &lt;/span&gt;
+                &lt;h2 className=&quot;font-serif-claude text-xl font-medium mt-0.5&quot;&gt;
+                  Generate Official Pattern {currentSubject.name} Paper
+                &lt;/h2&gt;
+                &lt;p className={`text-xs ${theme.textSecondary} mt-0.5`}&gt;
+                  {currentSubject.type === 'subjective'
+                    ? 'Generates a realistic ICAI subjective question paper. Write your answers on physical sheets, then upload photos right below for strict ICAI step-wise evaluation.'
+                    : 'Generates an ICAI weightage MCQ test in interactive quiz format with pre-submission answer review and negative marking.'}
+                &lt;/p&gt;
+              &lt;/div&gt;
+
+              {/* Paper Scope &amp; Chapter Selection */}
+              &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-3&quot;&gt;
+                &lt;div className=&quot;space-y-1.5&quot;&gt;
+                  &lt;label className={`text-xs font-medium ${theme.textSecondary}`}&gt;
+                    Paper Length / Scope
+                  &lt;/label&gt;
+                  &lt;div className=&quot;grid grid-cols-2 gap-2&quot;&gt;
+                    &lt;button
+                      onClick={() =&gt; setGenScope('custom')}
+                      className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition ${
+                        genScope === 'custom'
+                          ? 'border-[#D97757] bg-[#D97757]/15 text-[#D97757]'
+                          : `${theme.border} ${theme.card}`
+                      }`}
+                    &gt;
+                      Mini Mock (25M)
+                    &lt;/button&gt;
+                    &lt;button
+                      onClick={() =&gt; setGenScope('full')}
+                      className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition ${
+                        genScope === 'full'
+                          ? 'border-[#D97757] bg-[#D97757]/15 text-[#D97757]'
+                          : `${theme.border} ${theme.card}`
+                      }`}
+                    &gt;
+                      Full ICAI Pattern ({currentSubject.marks}M)
+                    &lt;/button&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;space-y-1.5&quot;&gt;
+                  &lt;label className={`text-xs font-medium ${theme.textSecondary}`}&gt;
+                    Select Chapter / Topic Focus
+                  &lt;/label&gt;
+                  &lt;select
+                    value={genSelectedChapter}
+                    onChange={(e) =&gt; setGenSelectedChapter(e.target.value)}
+                    className={`w-full py-2.5 px-3 rounded-xl border ${theme.border} ${theme.card} text-xs font-medium focus:outline-none focus:border-[#D97757]`}
+                  &gt;
+                    &lt;option value=&quot;All Syllabus Chapters (ICAI Weightage)&quot;&gt;
+                      All Syllabus Chapters (ICAI Weightage)
+                    &lt;/option&gt;
+                    {currentSubject.chapters.map((ch, idx) =&gt; (
+                      &lt;option key={idx} value={ch}&gt;
+                        {ch}
+                      &lt;/option&gt;
+                    ))}
+                  &lt;/select&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+
+              &lt;button
+                onClick={handleGenerateICAIPaper}
+                disabled={isGeneratingPaper}
+                className={`w-full py-3.5 px-5 rounded-xl ${theme.accentBg} ${theme.accentHover} text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50`}
+              &gt;
+                {isGeneratingPaper ? (
+                  &lt;&gt;
+                    &lt;RefreshCw className=&quot;w-4 h-4 animate-spin&quot; /&gt;
+                    &lt;span&gt;Setting ICAI {currentSubject.name} Paper...&lt;/span&gt;
+                  &lt;/&gt;
+                ) : (
+                  &lt;&gt;
+                    &lt;Sparkles className=&quot;w-4 h-4&quot; /&gt;
+                    &lt;span&gt;
+                      {currentSubject.type === 'subjective'
+                        ? `Generate ${currentSubject.name} Question Paper`
+                        : `Generate &amp; Start ${currentSubject.name} MCQ Quiz`}
+                    &lt;/span&gt;
+                  &lt;/&gt;
+                )}
+              &lt;/button&gt;
+            &lt;/div&gt;
+
+            {/* If Subjective Paper Generated -&gt; Display Paper + Answer Sheet Upload Box */}
+            {generatedPaper &amp;&amp; currentSubject.type === 'subjective' &amp;&amp; (
+              &lt;div className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-5`}&gt;
+                {/* Generated Paper Header */}
+                &lt;div className=&quot;flex flex-wrap items-start justify-between gap-3 border-b pb-4 border-[#E5E2DC] dark:border-[#2E2D2A]&quot;&gt;
+                  &lt;div&gt;
+                    &lt;span className=&quot;font-mono-claude text-[11px] uppercase px-2 py-0.5 rounded bg-[#D97757]/15 text-[#D97757]&quot;&gt;
+                      Generated ICAI Question Paper
+                    &lt;/span&gt;
+                    &lt;h3 className=&quot;font-serif-claude text-xl sm:text-2xl font-medium mt-1&quot;&gt;
+                      {generatedPaper.title}
+                    &lt;/h3&gt;
+                    &lt;p className={`text-xs ${theme.textSecondary} whitespace-pre-line mt-1`}&gt;
+                      {generatedPaper.instructions}
+                    &lt;/p&gt;
+                  &lt;/div&gt;
+
+                  &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                    &lt;span className=&quot;font-mono-claude text-xs font-bold px-3 py-1.5 rounded-xl border border-[#D97757]/40 text-[#D97757]&quot;&gt;
+                      Max Marks: {generatedPaper.totalMarks}
+                    &lt;/span&gt;
+                    &lt;button
+                      onClick={() =&gt; handleDownloadPaperText(generatedPaper)}
+                      className={`p-2 rounded-xl border ${theme.border} ${theme.card} hover:opacity-80`}
+                      title=&quot;Download Question Paper&quot;
+                    &gt;
+                      &lt;Download className=&quot;w-4 h-4&quot; /&gt;
+                    &lt;/button&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+
+                {/* Questions List */}
+                &lt;div className=&quot;space-y-3&quot;&gt;
+                  {(generatedPaper.questions || []).map((q, idx) =&gt; (
+                    &lt;div
+                      key={idx}
+                      className={`p-4 rounded-xl border ${theme.border} ${theme.card} space-y-1.5`}
+                    &gt;
+                      &lt;div className=&quot;flex items-center justify-between font-mono-claude text-xs font-bold&quot;&gt;
+                        &lt;span className=&quot;text-[#D97757]&quot;&gt;Question {q.qNo}&lt;/span&gt;
+                        &lt;span&gt;[{q.marks} Marks]&lt;/span&gt;
+                      &lt;/div&gt;
+                      &lt;p className=&quot;font-serif-claude text-base sm:text-lg leading-relaxed whitespace-pre-line&quot;&gt;
+                        {q.text}
+                      &lt;/p&gt;
+                    &lt;/div&gt;
+                  ))}
+                &lt;/div&gt;
+
+                {/* Upload Answer Sheet for this Generated Paper */}
+                &lt;div className={`p-4 rounded-xl border-2 border-dashed ${theme.border} ${theme.card} space-y-3.5`}&gt;
+                  &lt;div&gt;
+                    &lt;h4 className=&quot;font-serif-claude text-lg font-medium&quot;&gt;
+                      Submit Handwritten Answer Sheet for This Paper
+                    &lt;/h4&gt;
+                    &lt;p className={`text-xs ${theme.textSecondary}`}&gt;
+                      Write your answers on a register sheet and upload photos/PDF below (or type answers to test immediately).
+                    &lt;/p&gt;
+                  &lt;/div&gt;
+
+                  &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-2.5&quot;&gt;
+                    &lt;label className={`cursor-pointer p-3.5 rounded-xl border ${theme.border} ${theme.cardElevated} hover:border-[#D97757] transition flex items-center justify-center gap-2 text-xs font-semibold`}&gt;
+                      &lt;Camera className=&quot;w-4 h-4 text-[#D97757]&quot; /&gt;
+                      &lt;span&gt;Upload Answer Photos / PDF ({genAnswerFiles.length})&lt;/span&gt;
+                      &lt;input
+                        type=&quot;file&quot;
+                        accept=&quot;.pdf,image/*&quot;
+                        multiple
+                        onChange={(e) =&gt; handleAnswerSheetUpload(e, true)}
+                        className=&quot;hidden&quot;
+                      /&gt;
+                    &lt;/label&gt;
+
+                    &lt;button
+                      onClick={() =&gt;
+                        handleEvaluateSubjective(
+                          generatedPaper,
+                          genAnswerFiles,
+                          genManualAnswer
+                        )
+                      }
+                      disabled={isEvaluating}
+                      className={`p-3.5 rounded-xl ${theme.accentBg} text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm disabled:opacity-50`}
+                    &gt;
+                      &lt;Sparkles className=&quot;w-4 h-4&quot; /&gt;
+                      &lt;span&gt;{isEvaluating ? 'Checking Sheet...' : 'Evaluate Written Sheet Now'}&lt;/span&gt;
+                    &lt;/button&gt;
+                  &lt;/div&gt;
+
+                  &lt;textarea
+                    rows={4}
+                    value={genManualAnswer}
+                    onChange={(e) =&gt; setGenManualAnswer(e.target.value)}
+                    placeholder=&quot;Optional: Or type your answers here (e.g., Ans 1(a)...) if you want to test checking without camera upload...&quot;
+                    className={`w-full p-3 rounded-xl border ${theme.border} ${theme.inputBg} font-mono-claude text-xs`}
+                  /&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            )}
+
+            {evaluationReport &amp;&amp; (
+              &lt;SubjectiveScorecardView
+                report={evaluationReport}
+                theme={theme}
+                onClose={() =&gt; setEvaluationReport(null)}
+              /&gt;
+            )}
+          &lt;/div&gt;
+        )}
+
+        {/* ==========================================
+            TAB 3: HISTORY &amp; PAST EVALUATIONS
+           ========================================== */}
+        {activeTab === 'history' &amp;&amp; (
+          &lt;div className=&quot;space-y-4&quot;&gt;
+            &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+              &lt;div&gt;
+                &lt;h2 className=&quot;font-serif-claude text-2xl font-medium&quot;&gt;
+                  Evaluated Answer Sheets &amp; Past Quizzes
+                &lt;/h2&gt;
+                &lt;p className={`text-xs ${theme.textSecondary}`}&gt;
+                  Stored locally on your phone for offline revision and progress tracking
+                &lt;/p&gt;
+              &lt;/div&gt;
+              {historyItems.length &gt; 0 &amp;&amp; (
+                &lt;button
+                  onClick={() =&gt; {
+                    setHistoryItems([]);
+                    setViewingHistoryItem(null);
+                    localStorage.removeItem('icai_examiner_history_v1');
+                  }}
+                  className=&quot;text-xs text-rose-500 hover:underline flex items-center gap-1&quot;
+                &gt;
+                  &lt;Trash2 className=&quot;w-3.5 h-3.5&quot; /&gt;
+                  &lt;span&gt;Clear History&lt;/span&gt;
+                &lt;/button&gt;
+              )}
+            &lt;/div&gt;
+
+            {viewingHistoryItem ? (
+              &lt;div className=&quot;space-y-4&quot;&gt;
+                &lt;button
+                  onClick={() =&gt; setViewingHistoryItem(null)}
+                  className={`px-3.5 py-2 rounded-xl border ${theme.border} ${theme.card} text-xs font-medium flex items-center gap-1.5`}
+                &gt;
+                  &lt;ChevronLeft className=&quot;w-4 h-4&quot; /&gt;
+                  &lt;span&gt;Back to All History&lt;/span&gt;
+                &lt;/button&gt;
+
+                {viewingHistoryItem.mode === 'Subjective Evaluation' ? (
+                  &lt;SubjectiveScorecardView
+                    report={viewingHistoryItem.data}
+                    theme={theme}
+                    onClose={() =&gt; setViewingHistoryItem(null)}
+                  /&gt;
+                ) : (
+                  &lt;div className=&quot;space-y-3&quot;&gt;
+                    &lt;button
+                      onClick={() =&gt; {
+                        setActiveQuiz({
+                          title: viewingHistoryItem.data.title,
+                          subjectName: viewingHistoryItem.data.subjectName,
+                          level: viewingHistoryItem.data.level,
+                          negativeMarking: viewingHistoryItem.data.negativeMarking,
+                          questions: viewingHistoryItem.data.questions
+                        });
+                        setQuizResult(viewingHistoryItem.data);
+                      }}
+                      className={`w-full py-3 rounded-xl ${theme.accentBg} text-white text-xs font-semibold`}
+                    &gt;
+                      Open Full Interactive OMR Quiz Explanations
+                    &lt;/button&gt;
+                  &lt;/div&gt;
+                )}
+              &lt;/div&gt;
+            ) : historyItems.length === 0 ? (
+              &lt;div className={`p-10 rounded-2xl border ${theme.border} ${theme.card} text-center space-y-2`}&gt;
+                &lt;History className={`w-8 h-8 mx-auto ${theme.textSecondary}`} /&gt;
+                &lt;div className=&quot;font-serif-claude text-lg font-medium&quot;&gt;
+                  No Evaluated Papers Yet
+                &lt;/div&gt;
+                &lt;p className={`text-xs ${theme.textSecondary} max-w-sm mx-auto`}&gt;
+                  Evaluate a subjective Accounting/Law answer sheet or complete a QA/Economics MCQ quiz to see your ICAI scorecards saved here.
+                &lt;/p&gt;
+              &lt;/div&gt;
+            ) : (
+              &lt;div className=&quot;space-y-2.5&quot;&gt;
+                {historyItems.map((item) =&gt; (
+                  &lt;div
+                    key={item.id}
+                    onClick={() =&gt; {
+                      if (item.mode === 'MCQ Exam Quiz') {
+                        setActiveQuiz({
+                          title: item.data.title,
+                          subjectName: item.data.subjectName,
+                          level: item.data.level,
+                          negativeMarking: item.data.negativeMarking,
+                          questions: item.data.questions
+                        });
+                        setQuizResult(item.data);
+                      } else {
+                        setViewingHistoryItem(item);
+                      }
+                    }}
+                    className={`p-4 rounded-2xl border ${theme.border} ${theme.cardElevated} hover:border-[#D97757] cursor-pointer transition flex items-center justify-between gap-3`}
+                  &gt;
+                    &lt;div className=&quot;space-y-1 min-w-0&quot;&gt;
+                      &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                        &lt;span className={`text-[10px] font-mono-claude px-2 py-0.5 rounded border ${theme.accentSoft}`}&gt;
+                          {item.level} â¢ {item.subjectName}
+                        &lt;/span&gt;
+                        &lt;span className={`text-[11px] ${theme.textSecondary}`}&gt;
+                          {item.timestamp}
+                        &lt;/span&gt;
+                      &lt;/div&gt;
+                      &lt;div className=&quot;font-serif-claude text-base font-medium truncate&quot;&gt;
+                        {item.title}
+                      &lt;/div&gt;
+                      &lt;div className={`text-xs ${theme.textSecondary}`}&gt;
+                        {item.mode}
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+
+                    &lt;div className=&quot;text-right shrink-0&quot;&gt;
+                      &lt;div className=&quot;font-mono-claude text-base font-bold text-[#D97757]&quot;&gt;
+                        {item.score} / {item.maxScore}
+                      &lt;/div&gt;
+                      &lt;div className={`text-[11px] font-mono-claude ${item.percentage &gt;= 50 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600'}`}&gt;
+                        {item.percentage}%
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                ))}
+              &lt;/div&gt;
+            )}
+          &lt;/div&gt;
+        )}
+
+        {/* ==========================================
+            TAB 4: SETTINGS &amp; PHONE PWA INSTALLATION
+           ========================================== */}
+        {activeTab === 'settings' &amp;&amp; (
+          &lt;div className=&quot;space-y-4&quot;&gt;
+            &lt;h2 className=&quot;font-serif-claude text-2xl font-medium&quot;&gt;
+              App Settings &amp; Phone Installation
+            &lt;/h2&gt;
+
+            {/* Appearance &amp; Exam Preferences */}
+            &lt;div className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-4`}&gt;
+              &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                &lt;div&gt;
+                  &lt;div className=&quot;text-sm font-semibold&quot;&gt;Claude Editorial Theme&lt;/div&gt;
+                  &lt;div className={`text-xs ${theme.textSecondary}`}&gt;
+                    Switch between Warm Parchment (Light) and Obsidian (Dark)
+                  &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;button
+                  onClick={() =&gt; {
+                    const next = !darkMode;
+                    setDarkMode(next);
+                    try {
+                      localStorage.setItem('icai_examiner_dark', String(next));
+                    } catch (e) {}
+                  }}
+                  className={`px-4 py-2 rounded-xl border ${theme.border} ${theme.card} text-xs font-semibold flex items-center gap-2`}
+                &gt;
+                  {darkMode ? &lt;Sun className=&quot;w-4 h-4 text-amber-400&quot; /&gt; : &lt;Moon className=&quot;w-4 h-4&quot; /&gt;}
+                  &lt;span&gt;{darkMode ? 'Dark Mode Active' : 'Light Mode Active'}&lt;/span&gt;
+                &lt;/button&gt;
+              &lt;/div&gt;
+
+              &lt;div className=&quot;flex items-center justify-between pt-3 border-t border-[#E5E2DC] dark:border-[#2E2D2A]&quot;&gt;
+                &lt;div&gt;
+                  &lt;div className=&quot;text-sm font-semibold&quot;&gt;ICAI Exam Countdown Timer&lt;/div&gt;
+                  &lt;div className={`text-xs ${theme.textSecondary}`}&gt;
+                    Includes 15-minute compulsory reading time for full subjective papers
+                  &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;input
+                  type=&quot;checkbox&quot;
+                  checked={enableExamTimer}
+                  onChange={(e) =&gt; setEnableExamTimer(e.target.checked)}
+                  className=&quot;w-5 h-5 accent-[#D97757]&quot;
+                /&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            {/* Optional Custom Gemini API Key Override */}
+            &lt;div className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-3`}&gt;
+              &lt;div&gt;
+                &lt;div className=&quot;text-sm font-semibold&quot;&gt;Custom Gemini API Key (Optional for Standalone Phone Use)&lt;/div&gt;
+                &lt;p className={`text-xs ${theme.textSecondary} mt-0.5`}&gt;
+                  Inside this preview environment, AI evaluation works automatically without any key. When installed as a standalone file on your phone browser, paste your free Google AI Studio key here.
+                &lt;/p&gt;
+              &lt;/div&gt;
+              &lt;div className=&quot;flex gap-2&quot;&gt;
+                &lt;input
+                  type=&quot;password&quot;
+                  value={customApiKey}
+                  onChange={(e) =&gt; {
+                    setCustomApiKey(e.target.value);
+                    try {
+                      localStorage.setItem('icai_examiner_apikey', e.target.value);
+                    } catch (err) {}
+                  }}
+                  placeholder=&quot;AIzaSy... (Leave blank to use built-in environment key)&quot;
+                  className={`flex-1 px-3.5 py-2.5 rounded-xl border ${theme.border} ${theme.inputBg} font-mono-claude text-xs`}
+                /&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            {/* Install on Android / iPhone Guide */}
+            &lt;div className={`p-5 rounded-2xl border ${theme.border} ${theme.cardElevated} space-y-3`}&gt;
+              &lt;div className=&quot;flex items-center gap-2 text-[#D97757]&quot;&gt;
+                &lt;Smartphone className=&quot;w-5 h-5&quot; /&gt;
+                &lt;h3 className=&quot;font-serif-claude text-lg font-medium&quot;&gt;
+                  Use as a Full-Screen App on Your Phone
+                &lt;/h3&gt;
+              &lt;/div&gt;
+              &lt;ol className={`text-xs ${theme.textSecondary} space-y-2 list-decimal list-inside leading-relaxed`}&gt;
+                &lt;li&gt;
+                  &lt;strong&gt;On Android (Chrome):&lt;/strong&gt; Tap the three-dot menu in your browser and select &lt;strong&gt;&quot;Add to Home screen&quot;&lt;/strong&gt; or &lt;strong&gt;&quot;Install app&quot;&lt;/strong&gt;.
+                &lt;/li&gt;
+                &lt;li&gt;
+                  &lt;strong&gt;On iPhone (Safari):&lt;/strong&gt; Tap the &lt;strong&gt;Share&lt;/strong&gt; icon at the bottom and tap &lt;strong&gt;&quot;Add to Home Screen&quot;&lt;/strong&gt;.
+                &lt;/li&gt;
+                &lt;li&gt;
+                  All your evaluated Accounting &amp; Law answer sheets, QA &amp; Economics quizzes, and marks history are saved directly on your phone.
+                &lt;/li&gt;
+              &lt;/ol&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        )}
+      &lt;/main&gt;
+
+      {/* ==========================================
+          STICKY BOTTOM NAVIGATION BAR (4 TABS)
+         ========================================== */}
+      &lt;nav className={`fixed bottom-0 inset-x-0 z-40 border-t ${theme.border} ${theme.navBg} backdrop-blur-md px-2 py-1.5`}&gt;
+        &lt;div className=&quot;max-w-md mx-auto grid grid-cols-4 gap-1&quot;&gt;
+          &lt;button
+            onClick={() =&gt; setActiveTab('upload')}
+            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-1 transition ${
+              activeTab === 'upload' ? 'text-[#D97757] font-semibold' : theme.textSecondary
+            }`}
+          &gt;
+            &lt;Upload className=&quot;w-5 h-5&quot; /&gt;
+            &lt;span className=&quot;text-[11px]&quot;&gt;Upload &amp; Check&lt;/span&gt;
+          &lt;/button&gt;
+
+          &lt;button
+            onClick={() =&gt; setActiveTab('generate')}
+            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-1 transition ${
+              activeTab === 'generate' ? 'text-[#D97757] font-semibold' : theme.textSecondary
+            }`}
+          &gt;
+            &lt;Sparkles className=&quot;w-5 h-5&quot; /&gt;
+            &lt;span className=&quot;text-[11px]&quot;&gt;Generate Paper&lt;/span&gt;
+          &lt;/button&gt;
+
+          &lt;button
+            onClick={() =&gt; setActiveTab('history')}
+            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-1 transition relative ${
+              activeTab === 'history' ? 'text-[#D97757] font-semibold' : theme.textSecondary
+            }`}
+          &gt;
+            &lt;History className=&quot;w-5 h-5&quot; /&gt;
+            &lt;span className=&quot;text-[11px]&quot;&gt;History ({historyItems.length})&lt;/span&gt;
+          &lt;/button&gt;
+
+          &lt;button
+            onClick={() =&gt; setActiveTab('settings')}
+            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-1 transition ${
+              activeTab === 'settings' ? 'text-[#D97757] font-semibold' : theme.textSecondary
+            }`}
+          &gt;
+            &lt;Settings className=&quot;w-5 h-5&quot; /&gt;
+            &lt;span className=&quot;text-[11px]&quot;&gt;Settings&lt;/span&gt;
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/nav&gt;
+    &lt;/div&gt;
+  );
+}
+
+// ==========================================
+// SUB-COMPONENT: ICAI SUBJECTIVE EVALUATION SCORECARD
+// ==========================================
+function SubjectiveScorecardView({ report, theme, onClose }) {
+  if (!report) return null;
+
+  return (
+    &lt;div className={`p-5 sm:p-6 rounded-2xl border-2 border-[#D97757]/50 ${theme.cardElevated} shadow-lg space-y-6`}&gt;
+      {/* Header &amp; Total Marks Badge */}
+      &lt;div className=&quot;flex flex-wrap items-start justify-between gap-4 border-b pb-4 border-[#E5E2DC] dark:border-[#2E2D2A]&quot;&gt;
+        &lt;div className=&quot;space-y-1&quot;&gt;
+          &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+            &lt;span className=&quot;px-2.5 py-0.5 rounded-md bg-[#D97757] text-white font-mono-claude text-[11px] uppercase font-semibold&quot;&gt;
+              ICAI Examiner Certified Evaluation
+            &lt;/span&gt;
+          &lt;/div&gt;
+          &lt;h3 className=&quot;font-serif-claude text-2xl font-medium mt-1&quot;&gt;
+            {report.paperTitle || 'Evaluated Answer Sheet Report'}
+          &lt;/h3&gt;
+          &lt;p className={`text-xs ${theme.textSecondary}`}&gt;
+            {report.examinerVerdict}
+          &lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;div className={`p-4 rounded-2xl border ${theme.border} ${theme.card} text-center min-w-[135px]`}&gt;
+          &lt;div className=&quot;text-[11px] font-mono-claude uppercase text-[#D97757]&quot;&gt;
+            Marks Awarded
+          &lt;/div&gt;
+          &lt;div className=&quot;font-mono-claude text-3xl font-bold mt-0.5&quot;&gt;
+            {report.totalAwardedMarks}{' '}
+            &lt;span className={`text-base font-normal ${theme.textSecondary}`}&gt;
+              / {report.maxMarks}
+            &lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div
+            className={`text-xs font-semibold mt-0.5 ${
+              report.percentage &gt;= 40
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : 'text-rose-500'
+            }`}
+          &gt;
+            {report.percentage}% ({report.percentage &gt;= 60 ? 'Exemption Level!' : report.percentage &gt;= 40 ? 'Pass (&gt;=40%)' : 'Below 40% Criteria'})
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* Strengths &amp; ICAI Improvement Tips */}
+      &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-3&quot;&gt;
+        &lt;div className={`p-3.5 rounded-xl border ${theme.border} ${theme.card} space-y-1.5`}&gt;
+          &lt;div className=&quot;text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5&quot;&gt;
+            &lt;CheckCircle2 className=&quot;w-4 h-4&quot; /&gt;
+            &lt;span&gt;Key Strengths Observed&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;ul className={`text-xs ${theme.textSecondary} list-disc list-inside space-y-1`}&gt;
+            {(report.overallStrengths || []).map((s, i) =&gt; (
+              &lt;li key={i}&gt;{s}&lt;/li&gt;
+            ))}
+          &lt;/ul&gt;
+        &lt;/div&gt;
+
+        &lt;div className={`p-3.5 rounded-xl border ${theme.border} ${theme.card} space-y-1.5`}&gt;
+          &lt;div className=&quot;text-xs font-semibold text-[#D97757] flex items-center gap-1.5&quot;&gt;
+            &lt;Award className=&quot;w-4 h-4&quot; /&gt;
+            &lt;span&gt;ICAI Examiner Improvement Advice&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;ul className={`text-xs ${theme.textSecondary} list-disc list-inside space-y-1`}&gt;
+            {(report.icaiImprovementTips || []).map((tip, i) =&gt; (
+              &lt;li key={i}&gt;{tip}&lt;/li&gt;
+            ))}
+          &lt;/ul&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* Question-by-Question Step-Marking Breakdown */}
+      &lt;div className=&quot;space-y-4&quot;&gt;
+        &lt;h4 className=&quot;font-serif-claude text-lg font-medium&quot;&gt;
+          Question-Wise Step Marking &amp; ICAI Suggested Answers
+        &lt;/h4&gt;
+
+        {(report.questionEvaluations || []).map((qEval, idx) =&gt; (
+          &lt;div
+            key={idx}
+            className={`p-4 rounded-xl border ${theme.border} ${theme.card} space-y-3.5`}
+          &gt;
+            &lt;div className=&quot;flex items-center justify-between gap-2 border-b pb-2.5 border-[#E5E2DC] dark:border-[#2E2D2A]&quot;&gt;
+              &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                &lt;span className=&quot;font-mono-claude text-xs font-bold px-2.5 py-1 rounded bg-[#D97757]/15 text-[#D97757]&quot;&gt;
+                  Question {qEval.qNo}
+                &lt;/span&gt;
+                &lt;span className={`text-xs ${theme.textSecondary} truncate max-w-xs`}&gt;
+                  {qEval.questionText}
+                &lt;/span&gt;
+              &lt;/div&gt;
+              &lt;span className=&quot;font-mono-claude text-sm font-bold text-emerald-600 dark:text-emerald-400 shrink-0&quot;&gt;
+                {qEval.awardedMarks} / {qEval.maxMarks} Marks
+              &lt;/span&gt;
+            &lt;/div&gt;
+
+            {/* Student Transcribed Answer */}
+            &lt;div className=&quot;space-y-1&quot;&gt;
+              &lt;div className={`text-[11px] font-mono-claude uppercase ${theme.textSecondary}`}&gt;
+                Your Evaluated Answer:
+              &lt;/div&gt;
+              &lt;div className={`p-3 rounded-lg border ${theme.border} ${theme.cardElevated} font-mono-claude text-xs whitespace-pre-line leading-relaxed`}&gt;
+                {qEval.studentTranscribedAnswer || 'No answer detected for this sub-question.'}
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            {/* Step-Wise Marking Table */}
+            {qEval.stepMarksBreakdown &amp;&amp; qEval.stepMarksBreakdown.length &gt; 0 &amp;&amp; (
+              &lt;div className=&quot;space-y-1.5&quot;&gt;
+                &lt;div className={`text-[11px] font-mono-claude uppercase ${theme.textSecondary}`}&gt;
+                  ICAI Step-Marking Breakdown:
+                &lt;/div&gt;
+                &lt;div className=&quot;grid grid-cols-1 sm:grid-cols-2 gap-2&quot;&gt;
+                  {qEval.stepMarksBreakdown.map((step, sIdx) =&gt; (
+                    &lt;div
+                      key={sIdx}
+                      className={`px-3 py-2 rounded-lg border ${theme.border} ${theme.cardElevated} flex items-center justify-between text-xs`}
+                    &gt;
+                      &lt;span className=&quot;truncate pr-2&quot;&gt;{step.stepComponent}&lt;/span&gt;
+                      &lt;span className=&quot;font-mono-claude font-semibold text-[#D97757] shrink-0&quot;&gt;
+                        {step.marksGiven}/{step.maxStepMarks}M
+                      &lt;/span&gt;
+                    &lt;/div&gt;
+                  ))}
+                &lt;/div&gt;
+              &lt;/div&gt;
+            )}
+
+            {/* Specific Deductions */}
+            {qEval.specificDeductions &amp;&amp; (
+              &lt;div className=&quot;p-3 rounded-lg bg-rose-500/10 border border-rose-500/25 text-xs space-y-0.5&quot;&gt;
+                &lt;div className=&quot;font-semibold text-rose-600 dark:text-rose-400&quot;&gt;
+                  Where Marks Were Deducted:
+                &lt;/div&gt;
+                &lt;p className=&quot;leading-relaxed&quot;&gt;{qEval.specificDeductions}&lt;/p&gt;
+              &lt;/div&gt;
+            )}
+
+            {/* Official ICAI Model Answer */}
+            &lt;div className={`p-3 rounded-lg border ${theme.border} ${theme.cardElevated} text-xs space-y-1`}&gt;
+              &lt;div className=&quot;font-semibold text-[#D97757] flex items-center gap-1.5&quot;&gt;
+                &lt;BookOpen className=&quot;w-3.5 h-3.5&quot; /&gt;
+                &lt;span&gt;Official ICAI Study Material / Suggested Answer:&lt;/span&gt;
+              &lt;/div&gt;
+              &lt;p className=&quot;whitespace-pre-line leading-relaxed&quot;&gt;{qEval.icaiSuggestedModelAnswer}&lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</pre>
+</body>
+</html>
